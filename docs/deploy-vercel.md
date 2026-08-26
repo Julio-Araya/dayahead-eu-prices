@@ -5,6 +5,7 @@ Dos proyectos desde el mismo repositorio (`Julio-Araya/dayahead-eu-prices`), cad
 ## Proyecto 1: `dayahead-api` (Root Directory = `api`)
 
 - Framework Preset: **Other**. Build Command y Output Directory: por defecto (`npm run build` compila con `tsc`; la función es `api/index.ts` y `vercel.json` reenvía toda ruta a ella). Node 20 o superior.
+- Región de la función: `vercel.json` fija `dub1` (Dublín, la misma región `eu-west-1` de Supabase). Sin eso Vercel la ponía en `gru1` (São Paulo) y cada consulta pagaba ~250 ms de ida y vuelta al pooler; con la región junto a la base son unos milisegundos.
 
 | Variable | Valor | De dónde sale |
 |---|---|---|
