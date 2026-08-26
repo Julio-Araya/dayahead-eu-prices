@@ -140,6 +140,48 @@ Detalle de D3. La clave (`dap_` + 24 bytes aleatorios en base64url) se muestra u
 - **Paleta por país** validada con `dataviz/validate_palette.js` sobre la superficie `#fbfbf3` del design system (banda de luminosidad, piso de croma, separación CVD, contraste): ES `#0E9C8B`, RO `#E5431F`, DE `#7A5AA6`, PL `#B8860B`. El teal-500 de marca (`#0E8C7F`) no supera el piso de croma; ciruela y ámbar son extensión del producto porque el sistema solo trae tres familias. Asignación fija por país, nunca por orden de aparición; ocultar una serie no recolorea las demás.
 - **Sin librerías de gráficas**: SVG a mano (~150 líneas), en línea con "sin librerías de componentes externas" y con la guía de marcas (líneas de 2 px, grilla hairline, marcadores con anillo de superficie, leyenda siempre presente con ≥ 2 series, etiquetas al final solo si no chocan, tabla gemela).
 
+## Infraestructura: contenido para el documento técnico (2026-08-26)
+
+Material ordenado para la sección de infraestructura; la redacción final la hace Julio.
+
+### Regiones y dónde corre cada pieza
+
+| Pieza | Dónde | Por qué |
+|---|---|---|
+| Fabric (Lakehouse, notebook, pipeline) | Capacidad Trial del tenant de Grenergy, región **North Europe** | Es la capacidad que da la prueba; no se elige |
+| Supabase Postgres (capa de servicio) | **eu-west-1** (Irlanda), Postgres 17 | Región europea más cercana a Fabric y a los consumidores (España) |
+| API (Vercel, función serverless) | Función fijada en **dub1** (Dublín = eu-west-1) vía `vercel.json`; el edge que recibe la petición es el más cercano al cliente (`gru1` desde Chile) | Sin fijarla, Vercel la puso en `gru1` (São Paulo) y cada consulta a la base cruzaba el Atlántico |
+| Web (Vercel, estático + función BFF) | Estático en el edge global; el BFF llama a la API | El BFF solo reenvía; su región importa poco |
+
+### Conectividad a Supabase: IPv6 y pooler
+
+- La conexión directa `db.<ref>.supabase.co:5432` solo publica registro **AAAA (IPv6)**. Desde una red sin IPv6 (la de desarrollo, y en general muchas redes corporativas) da `ENOTFOUND`. Se verificó con `dig`: sin registro A, y sin ruta IPv6 por defecto en la máquina.
+- Solución: el **pooler** de Supabase, que sí tiene IPv4. El host del proyecto es `aws-1-eu-west-1.pooler.supabase.com` (no `aws-0`: ese pooler no conoce el tenant), usuario `postgres.<ref>`.
+- Dos modos del pooler, dos usos: **session** (puerto 5432) para migraciones y scripts locales; **transaction** (puerto 6543) para la función serverless, porque cada instancia abre y cierra conexiones y el modo transaction las reparte. Con transaction no se pueden usar sentencias preparadas con nombre; la API no las usa.
+- Pool de `pg` por instancia: máximo 5 conexiones, ociosas 5 minutos (reabrir TLS hacia el pooler costaba segundos).
+
+### Latencia medida (2026-08-26, desde Santiago de Chile)
+
+| Momento | Medición | Causa |
+|---|---|---|
+| API en `gru1`, primera petición tras > 10 s de inactividad | **~6 s** | El pool cerraba conexiones ociosas a los 10 s; cada petición nueva reabría TLS hacia el pooler en Irlanda |
+| API en `gru1`, en caliente | **~0,5 s** por petición | Dos idas a la base por petición (validar la API key + la consulta) a ~250 ms de RTT cada una |
+| Consultas SQL medidas directamente contra Supabase | `connect` 1,45 s; `status`, `countries`, `touch` ~250 ms cada una | RTT Chile↔Irlanda, no tiempo de ejecución (tablas de decenas o miles de filas) |
+| Tras los cambios (función en `dub1`, caché de keys 60 s, pool 5 min) | raíz 0,68 s; `/v1/health` 0,69–0,95 s; `/v1/status` con key 0,78–1,07 s; lectura horaria de un día por el BFF de la web 2,0 s | Lo que queda es el salto Chile↔Irlanda de ida y vuelta; función y base están en la misma región |
+
+Lección para el documento: en serverless la latencia la fijan los saltos de red entre función y base, no el cómputo. Poner la función junto a la base y no pagar una ida a la base para autenticar cada petición vale más que cualquier optimización de consulta.
+
+### Fabric → API: firma HMAC con vectores compartidos
+
+- `POST /v1/ingest` con `X-Timestamp`, `X-Nonce` y `X-Signature: sha256=HMAC_SHA256(secreto, "<timestamp>.<nonce>." + cuerpo)`. Ventana de ±300 s y nonce de un solo uso (tabla `ingest_nonces`, purgada a la hora), upsert en una transacción con el registro del nonce.
+- El emisor es un notebook sin identidad propia; lo que puede tener es un secreto compartido guardado en la Biblioteca de variables de Fabric (`vl_dayahead.INGEST_HMAC_SECRET`) y en el entorno de la función (`INGEST_HMAC_SECRET`).
+- Hay dos implementaciones (Python en `etl/dayahead/publish.py`, TypeScript en `api/src/auth/hmac.ts`) y un solo archivo de vectores de prueba, `etl/tests/fixtures/hmac_vectors.json`, que corre en las dos suites. Si una diverge de la otra, falla un test antes de llegar a producción. Verificado de punta a punta con una ingestión real firmada desde local contra la API en Vercel (1560 filas, idempotente al repetirla).
+
+### Despliegue en Vercel: lo que rompió y por qué
+
+- Vercel detecta `express` en `package.json` y aplica su zero-config para Express: busca un entry (`src/app.ts`) y lo invoca como servidor para `/`. `src/app.ts` exporta la fábrica `createApp` (para poder testear sin base), no la app; resultado: `Invalid export found in module … app.js` solo en la raíz, porque las demás rutas caían en el rewrite hacia `api/index.ts`. Se resolvió declarando la función de forma explícita (`builds` + `routes`), que desactiva la detección.
+- La API y la web son dos proyectos de Vercel sobre el mismo repositorio, con Root Directory `api` y `web`. Variables por proyecto en `docs/deploy-vercel.md`; los secretos nunca están en el repo.
+
 ---
 
 ## Pendientes (deudas registradas, sin decidir)
