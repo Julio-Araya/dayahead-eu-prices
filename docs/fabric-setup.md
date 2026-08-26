@@ -145,15 +145,15 @@ Vuelve a ejecutar **Run all**. El resumen tiene que ser idéntico y el conteo de
 
 Deberías ver: la actividad en verde, estado **Succeeded**, y si abres el detalle, el snapshot del notebook con el mismo resumen del paso 4.5. Si falla en la primera celda con un error de `%pip`, falta `_inlineInstallationEnabled`.
 
-## 6. Programación diaria a las 16:00 UTC
+## 6. Programación diaria a las 18:00 UTC
 
 1. En el editor del pipeline, **Home → Schedule**.
-2. **Scheduled run**: On. **Repeat**: Daily. **Time**: 16:00. **Start date/time**: hoy. **End**: una fecha lejana (por ejemplo dentro de un año). **Time zone**: **(UTC) Coordinated Universal Time**.
+2. **Scheduled run**: On. **Repeat**: Daily. **Time**: 18:00. **Start date/time**: hoy. **End**: una fecha lejana (por ejemplo dentro de un año). **Time zone**: **(UTC) Coordinated Universal Time**.
 3. **Apply**.
 
-Deberías ver: junto al botón Schedule, "Next run: <mañana> 16:00 UTC".
+Deberías ver: junto al botón Schedule, "Next run: <mañana> 18:00 UTC".
 
-Por qué 16:00 UTC (D10): a esa hora ENTSO-E y PSE ya publicaron D+1 con margen, SMARD suele haberlo hecho, y la tasa del BCE del día (≈14:15Z) ya está. Lo que no esté, queda `pending` y entra al día siguiente porque la ventana empieza en D-3.
+Por qué 18:00 UTC (D10): ENTSO-E y PSE publican D+1 alrededor de las 12:00Z y el BCE la tasa del día a las ≈14:15Z, pero SMARD regeneró su bloque semanal a las **17:10Z** el 26-ago-2026 (a las 14:35Z el D+1 alemán venía todo `null`). A las 18:00 UTC entran los cuatro países el mismo día. Lo que aun así no esté, queda `pending` y entra al día siguiente porque la ventana empieza en D-3.
 
 ## 7. Backfill de 30 días
 
@@ -249,7 +249,7 @@ Al actualizar el módulo tendrías que republicar el Entorno; con la opción (d)
 - [ ] `sources_config` tiene 4 filas con `active = true`.
 - [ ] `load_control` no tiene `error`; los `pending`, si hay, son de D+1.
 - [ ] La consulta (c) devuelve cero filas.
-- [ ] El pipeline muestra "Next run" a las 16:00 UTC.
+- [ ] El pipeline muestra "Next run" a las 18:00 UTC.
 - [ ] Nombres del workspace sin elementos sueltos (sin notebooks "Notebook 1" ni lakehouses de prueba).
 
 ## Cuando cambie el código del módulo
