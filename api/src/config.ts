@@ -1,4 +1,11 @@
-import "dotenv/config";
+import { config as loadDotenv } from "dotenv";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+// .env vive en la raíz del repo (compartido con etl/ y fabric/), no en api/.
+const here = path.dirname(fileURLToPath(import.meta.url));
+loadDotenv({ path: path.resolve(here, "../../.env") });
+loadDotenv(); // y, si existe, el del directorio actual (no sobreescribe)
 
 function required(name: string, fallback?: string): string {
   const value = process.env[name] ?? fallback;
