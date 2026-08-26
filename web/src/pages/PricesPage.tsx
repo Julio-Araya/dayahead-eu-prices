@@ -59,7 +59,7 @@ export function PricesPage({ countries, status }: { countries: Remote<CountryRow
         </EmptyState>
       )}
 
-      {seriesEur.length > 0 && (
+      {valid && seriesEur.length > 0 && (
         <>
           <section className={`card${refreshing ? " is-refreshing" : ""}`} aria-busy={refreshing}>
             <div className="card-head">
