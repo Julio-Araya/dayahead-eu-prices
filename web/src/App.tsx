@@ -20,7 +20,7 @@ export default function App() {
   return (
     <>
       <Header page={page} onNavigate={setPage} />
-      {page === "prices" ? <PricesPage countries={countries} status={status} /> : <QualityPage />}
+      {page === "prices" ? <PricesPage countries={countries} status={status} /> : <QualityPage countries={countries} status={status} />}
       <footer className="container footer">Fuente: ENTSO-E (ES, RO), SMARD (DE), PSE (PL); tipo de cambio BCE. Ingesta diaria a las 18:00 UTC desde Microsoft Fabric.</footer>
     </>
   );
