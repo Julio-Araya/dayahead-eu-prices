@@ -6,4 +6,4 @@ reciben las respuestas crudas de cada API (bytes, str o dict) y devuelven listas
 funciones y escribe en Delta.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

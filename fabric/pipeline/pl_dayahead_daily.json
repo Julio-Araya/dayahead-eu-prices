@@ -37,7 +37,7 @@
     "_comment": "La programacion no forma parte de la definicion del pipeline; se configura en Schedule dentro del editor.",
     "enabled": true,
     "frequency": "Daily",
-    "time": "16:00",
+    "time": "18:00",
     "timeZone": "UTC"
   }
 }

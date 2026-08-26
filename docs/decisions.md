@@ -32,16 +32,18 @@ Fuente del documento técnico final. Cada decisión lleva contexto, opciones con
 
 **Elegida:** PT60M, como pide el enunciado. La resolución y el nombre del índice son parámetros de la fila de configuración (`params.index`, `params.block`, `resolution`), así que pasar Alemania a PT15M sería un cambio de configuración y un backfill, sin tocar código. Queda documentado como evolución posible.
 
-## D10. Corrida diaria: 16:00 UTC, ventana [D-3, D+1], completitud por slots (2026-08-26)
+## D10. Corrida diaria: 18:00 UTC, ventana [D-3, D+1], completitud por slots (2026-08-26)
 
 **Contexto.** Las cuatro fuentes publican el día D+1 a distintas horas: ENTSO-E y PSE alrededor de las 12:45-13:00 CET, SMARD con retraso variable (a las 13:35Z del 26-ago el 27-ago aún venía en `null`). El BCE publica la tasa del día ~16:15 CET. Un watermark simple ("último día cargado") no sirve: un día puede estar parcialmente publicado y una fuente puede corregir datos.
 
 **Decisión.**
-- Schedule diario a las **16:00 UTC**. A esa hora D+1 está publicado en ENTSO-E y PSE con margen, SMARD suele estarlo, y la tasa del BCE del día ya salió.
+- Schedule diario a las **18:00 UTC** (inicialmente 16:00; ver enmienda abajo). A esa hora D+1 está publicado en ENTSO-E y PSE con margen, la tasa del BCE del día ya salió y SMARD ya regeneró su bloque.
 - En cada corrida se procesa la ventana **[D-3, D+1]** por país, donde D es la fecha UTC de la corrida. Toda escritura es upsert por `(country_code, ts_utc)`, así que reprocesar días ya completos es inocuo y absorbe correcciones tardías.
 - Un día se marca **completo** solo cuando `slots cargados = slots esperados` para su granularidad y su calendario DST (96/92/100 para PT15M, 24/23/25 para PT60M), calculados desde `market_tz`.
 - Si un día no tiene datos (D+1 antes de publicación) el estado es **pendiente**, no error. Se reintenta en la siguiente corrida. Un día con datos pero incompleto queda **incompleto** y también se reintenta.
 - Esto reemplaza cualquier lógica de watermark.
+
+**Enmienda (2026-08-26, ratificada por Julio).** Evidencia del smoke de Fase 3: a las 14:35Z el bloque semanal de SMARD seguía siendo el generado el 25-ago a 12:42Z (D+1 alemán en `null`), y en la ingestión real de las 17:36Z ya traía el 27-ago con `meta_data.created = 2026-08-26T17:10:42Z`. Con la corrida a las 16:00 UTC Alemania habría quedado `pending` cada día hasta la corrida siguiente. Se mueve a **18:00 UTC** para que los cuatro países entren el mismo día; la ventana [D-3, D+1] sigue cubriendo cualquier retraso mayor.
 
 ## D11. `ts_utc` es el inicio del intervalo en las cuatro fuentes (2026-08-26)
 
@@ -105,6 +107,38 @@ El PDF original contiene el token de ENTSO-E en texto plano. Se versiona `docs/p
 | Entornos | Compatibles | No disponibles |
 
 **Elegida: PySpark.** Spark no hace cómputo: el notebook convierte las filas del módulo en un DataFrame y ejecuta `MERGE` por `(country_code, ts_utc)`. El notebook Python con delta-rs queda documentado como la alternativa más barata; migrar sería cambiar solo la celda de escritura, el módulo no cambia.
+
+## D18. Endpoint de ingestión firmado con HMAC SHA256, timestamp y nonce (2026-08-26)
+
+**Contexto.** Fabric publica hacia la API al final de cada corrida (D1, opción 1). El emisor es un notebook sin identidad propia; lo que puede tener es un secreto compartido.
+
+**Decisión.** `POST /v1/ingest` con cabeceras `X-Timestamp` (segundos Unix), `X-Nonce` (UUID) y `X-Signature: sha256=HMAC_SHA256(secreto, "<timestamp>.<nonce>." + cuerpo)`. El cuerpo se firma byte a byte tal como se envía (JSON compacto con claves ordenadas, decimales como texto). El servidor rechaza timestamps a más de 300 s de su reloj y nonces ya vistos (tabla `ingest_nonces`, purgada a la hora), y hace el upsert en una transacción junto con el registro del nonce: o entra todo o no entra nada.
+
+**Por qué así.** Firmar el cuerpo evita manipulación en tránsito además de autenticar; el timestamp acota el replay a una ventana corta y el nonce lo elimina dentro de ella. Es el esquema de webhooks de Stripe y GitHub, conocido por cualquier equipo. La implementación de referencia vive en `etl/dayahead/publish.py` (Python, lo usa el notebook) y `api/src/auth/hmac.ts`, con vectores de prueba compartidos para que no diverjan.
+
+**Descartado.** API key para la ingestión: no protege el cuerpo ni evita replay. mTLS: imposible de configurar desde un notebook de Fabric.
+
+## D19. API keys con hash, alcance de lectura y límite por clave (2026-08-26)
+
+Detalle de D3. La clave (`dap_` + 24 bytes aleatorios en base64url) se muestra una sola vez al crearla (`npm run create-key`); en `api_keys` queda `sha256(clave)` y un prefijo de 8 caracteres para identificarla. Viaja en `Authorization: Bearer` o `X-API-Key`. Cada clave tiene su `rate_limit_per_minute`; el contador es una ventana fija de un minuto **en memoria del proceso**. Límite conocido: en Vercel cada instancia serverless cuenta por separado, así que el tope real es por instancia. Para los consumidores previstos (una interfaz vía BFF y agentes) alcanza; el paso siguiente sería un contador en Postgres o Redis. La interfaz nunca recibe la clave: la pone su BFF (Fase 4).
+
+## D20. Lector detrás de una interfaz; resample en el servicio; una sola tabla en Postgres (2026-08-26)
+
+- `PriceReader` con dos implementaciones elegidas por `DATA_READER`: `postgres` (activa) y `fabric-graphql` (BRIEF D1, opción 3). La segunda implementa client credentials contra Entra ID y las consultas GraphQL con la convención de la API for GraphQL de Fabric (tabla pluralizada, `filter`/`first`/`orderBy`, `items`). **Hipótesis**: los nombres exactos del esquema GraphQL se confirman al crear la API en Fabric, cosa que exige un service principal que la prueba no permite. Sin credenciales, `ping()` lo dice y las lecturas responden 503.
+- El resample PT15M → PT60M (D5) se hace en el servicio de la API, no en SQL, para que los dos lectores compartan una sola implementación probada (promedio con enteros escalados, redondeo half-up a 4 decimales, `slots` por hora para señalar horas incompletas).
+- Postgres replica las cuatro tablas de Fabric en una sola `prices` con clave `(country_code, ts_utc)` e índice por `(country_code, business_date_local)`. Una tabla por país tiene sentido en el Lakehouse (enunciado de la prueba, ingestión independiente); en la capa de servicio complica cada consulta multipaís sin aportar nada.
+- `countries` en Postgres es el espejo de `sources_config`: agregar un país a la API es una fila (`002_seed_countries.sql` hace upsert, así que se puede reaplicar).
+- Decimales viajan y se guardan como texto (`numeric` en Postgres, `string` en JSON): sin pérdida por coma flotante en ninguna capa.
+
+## D21. Interfaz: BFF, gráfica escalonada en EUR, cinco estados, paleta por país (2026-08-26)
+
+- **BFF en el mismo dominio** (`web/bff/handler.ts`): el navegador llama a `/api/*`; el BFF agrega la API key y reenvía solo rutas de lectura (allowlist), traduce 401/403 de la API a 403 ("sin permiso") y responde 503 si no está configurado. El mismo handler corre como middleware de Vite en desarrollo y como función serverless en Vercel, así no hay dos implementaciones.
+- **Comparativa siempre en EUR.** El toggle de moneda cambia los paneles por país y la tabla (Polonia en PLN), nunca la comparativa: dos monedas sobre un mismo eje es un doble eje encubierto, la escala inventa una relación que no existe.
+- **Líneas escalonadas** (`stepPath`): un precio day-ahead es constante durante su intervalo; interpolar entre puntos dibujaría valores que nunca existieron. La línea se corta en huecos reales en vez de unirlos.
+- **Horas en UTC** en ejes, tooltip y tabla, igual que en la base de datos. Mostrar hora local de cada mercado en una comparativa de cuatro zonas induce a error; queda como evolución posible un selector de zona.
+- **Cinco estados** (CLAUDE.md): `loading` conserva el render anterior atenuado (sin parpadeo), `empty` solo tras 200 con cero filas, `error`, `forbidden` (credencial del BFF rechazada) y **desactualizado** como banner sobre los datos cuando `/v1/status` marca más de 26 h sin corrida.
+- **Paleta por país** validada con `dataviz/validate_palette.js` sobre la superficie `#fbfbf3` del design system (banda de luminosidad, piso de croma, separación CVD, contraste): ES `#0E9C8B`, RO `#E5431F`, DE `#7A5AA6`, PL `#B8860B`. El teal-500 de marca (`#0E8C7F`) no supera el piso de croma; ciruela y ámbar son extensión del producto porque el sistema solo trae tres familias. Asignación fija por país, nunca por orden de aparición; ocultar una serie no recolorea las demás.
+- **Sin librerías de gráficas**: SVG a mano (~150 líneas), en línea con "sin librerías de componentes externas" y con la guía de marcas (líneas de 2 px, grilla hairline, marcadores con anillo de superficie, leyenda siempre presente con ≥ 2 series, etiquetas al final solo si no chocan, tabla gemela).
 
 ---
 

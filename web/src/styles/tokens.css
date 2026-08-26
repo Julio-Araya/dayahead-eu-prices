@@ -1,0 +1,41 @@
+/* Tokens tomados de design/relevo-design-system-v1.html (sin marca). Solo modo claro: el sistema no define oscuro. */
+:root {
+  --ink: #16332b;
+  --ink-2: #1e4034;
+  --page: #fffff3;
+  --surface: #fbfbf3;
+  --surface-2: #f0f0e2;
+  --surface-3: #deded0;
+  --coral: #ff5a3c;
+  --coral-dark: #e5431f;
+  --coral-soft: #ff7a5e;
+  --coral-light: #ffe7df;
+  --teal: #0e8c7f;
+  --teal-dark: #0a5f57;
+  --teal-deep: #063b36;
+  --teal-soft: #7fc9bc;
+  --teal-light: #e2f0ec;
+  --text: #16332b;
+  --text-2: #4c5a52;
+  --muted: #8a9089;
+  --border: rgba(22, 51, 43, 0.12);
+  --border-strong: rgba(22, 51, 43, 0.22);
+  --grid: #e6e6d8;
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --radius-pill: 999px;
+  --shadow-cta: 0 4px 16px rgba(22, 51, 43, 0.22);
+  --shadow-card: 0 24px 64px rgba(22, 51, 43, 0.2), 0 4px 16px rgba(22, 51, 43, 0.1);
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --font-display: "Plus Jakarta Sans", "Hanken Grotesk", system-ui, sans-serif;
+  --font-ui: "Hanken Grotesk", "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Paleta categórica por país (validada con dataviz/validate_palette.js sobre --surface).
+     Asignación fija por entidad, nunca por orden. Teal-500 de marca (#0E8C7F) no supera el piso de
+     croma del validador; se usa el paso #0E9C8B. Ciruela y ámbar son extensión del producto. */
+  --series-es: #0e9c8b;
+  --series-ro: #e5431f;
+  --series-de: #7a5aa6;
+  --series-pl: #b8860b;
+}

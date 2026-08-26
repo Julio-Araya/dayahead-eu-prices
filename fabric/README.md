@@ -28,4 +28,4 @@ python3 fabric/build.py
 | Lakehouse | `lh_dayahead` | 4 tablas de precios, `sources_config`, `load_control`, `fx_rates` |
 | Biblioteca de variables | `vl_dayahead` | `ENTSOE_TOKEN` (String) |
 | Notebook | `nb_dayahead_ingest` | ingesta; crea las tablas si faltan y siembra `sources_config` |
-| Pipeline | `pl_dayahead_daily` | actividad Notebook, schedule diario 16:00 UTC, parámetros para backfill |
+| Pipeline | `pl_dayahead_daily` | actividad Notebook, schedule diario 18:00 UTC, parámetros para backfill |

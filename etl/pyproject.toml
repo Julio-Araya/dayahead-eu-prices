@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dayahead"
-version = "0.1.0"
+version = "0.2.0"
 description = "Parseo y transformación de precios day-ahead (ENTSO-E, SMARD, PSE, BCE). Módulo puro, sin I/O."
 requires-python = ">=3.9"
 dependencies = []
