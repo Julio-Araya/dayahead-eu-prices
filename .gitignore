@@ -1,0 +1,14 @@
+.env
+spike/raw/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+dist/
+.vercel/
+
+# PDF original de la prueba: contiene el token de ENTSO-E en texto plano. Se versiona solo la copia redactada.
+docs/Prueba técnica_AI & Data engineer.pdf
+build/
+*.egg-info/
+.pytest_cache/

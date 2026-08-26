@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relevo Studio · Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"Plus Jakarta Sans","Hanken Grotesk",system-ui,sans-serif; background:#fffff3; color:#16332B; -webkit-font-smoothing:antialiased; line-height:1.4; }
+  code{ font-family:ui-monospace,monospace; font-size:.85em; background:rgba(14,140,127,.1); padding:2px 6px; border-radius:5px; color:#0A5F57; }
+  a{ color:inherit; }
+  a:focus-visible, button:focus-visible{ outline:2px solid #FF5A3C; outline-offset:3px; }
+
+  @keyframes rv-reveal{0%{clip-path:inset(50% 0 50% 0)}18%,86%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(50% 0 50% 0)}}
+  @keyframes rv-text{0%{transform:translateY(110%)}18%,86%{transform:translateY(0)}100%{transform:translateY(110%)}}
+  @keyframes rv-letter{0%{color:#E5431F}26%,82%{color:#fffbf5}100%{color:#E5431F}}
+  @keyframes rv-mask{0%{transform:translateY(60px);opacity:0}18%,86%{transform:translateY(0);opacity:1}100%{transform:translateY(60px);opacity:0}}
+  @keyframes rv-grow{0%{transform:scale(.5);opacity:0}18%,86%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}
+  @keyframes rv-slide{0%{transform:translateY(33%);opacity:0}18%,86%{transform:translateY(0);opacity:1}100%{transform:translateY(33%);opacity:0}}
+  @keyframes rv-marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  @keyframes rv-ease{from{left:6px}to{left:calc(100% - 30px)}}
+  @keyframes rv-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.35}}
+  /* firma propia de Relevo: el relevo — un círculo entrega la posta al otro */
+  @keyframes rv-handoff{0%,100%{transform:translateX(0)}45%,55%{transform:translateX(7px)}}
+  @keyframes rv-handoff-b{0%,100%{transform:translateX(0)}45%,55%{transform:translateX(-7px)}}
+
+  .rv-btn{ display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:16px; border-radius:999px; padding:14px 24px; text-decoration:none; transition:transform .3s cubic-bezier(.25,1,.5,1), box-shadow .3s cubic-bezier(.25,1,.5,1); }
+  .rv-btn:hover{ transform:translateY(-2px); box-shadow:0 4px 16px rgba(22,51,43,.22); }
+  .rv-btn span{ display:inline-block; transition:transform .3s cubic-bezier(.25,1,.5,1); }
+  .rv-btn:hover span{ transform:translate(3px,-3px); }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none!important; transition:none!important } }
+</style>
+</head>
+<body>
+
+<div style="width:100%; background:#fffff3;">
+
+  <!-- HEADER -->
+  <header style="background:radial-gradient(120% 100% at 100% 0%, rgba(255,90,60,.10), transparent 60%); border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:60px 28px 48px;">
+      <span style="display:inline-flex; align-items:center; gap:9px; font-family:'Hanken Grotesk'; font-weight:600; font-size:12px; letter-spacing:.16em; text-transform:uppercase; padding:7px 14px 7px 10px; border-radius:999px; background:#16332B; color:#FFE7DF; margin-bottom:26px;">
+        <svg width="26" height="15" viewBox="0 0 120 60" style="display:block;" aria-hidden="true"><circle cx="52" cy="30" r="22" fill="none" stroke="#7FC9BC" stroke-width="9"></circle><circle cx="68" cy="30" r="22" fill="none" stroke="#FF7A5E" stroke-width="9"></circle></svg>
+        Relevo Studio · Design System
+      </span>
+      <h1 style="font-size:clamp(2.4rem,6vw,60px); font-weight:800; letter-spacing:-.05em; line-height:1.03;">El sistema de la marca,<br>documentado y en movimiento</h1>
+      <p style="font-family:'Hanken Grotesk'; margin-top:16px; color:#4C5A52; font-size:16px; max-width:620px;">Tokens, tipografía, motion y componentes de Relevo Studio — estrategia, producto e IA aplicada para empresas de Latinoamérica. Un sistema base que heredan los productos de la casa, empezando por Workieo.</p>
+      <div style="display:inline-flex; align-items:center; gap:8px; margin-top:24px; background:#f0f0e2; border:1px solid rgba(22,51,43,.12); border-radius:999px; padding:9px 18px; font-family:'Hanken Grotesk'; font-size:14px; font-weight:500;">Dirección de marca: <strong style="font-weight:700;">Sage × Creator</strong> · estrategia ↔ construcción</div>
+    </div>
+  </header>
+
+  <!-- HERO WORDMARK -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:56px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">00 — Logotipo</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:22px;">Wordmark</h2>
+      <div style="background:#fbfbf3; border:1px solid rgba(22,51,43,.1); border-radius:40px; padding:72px 44px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:18px;">
+        <div style="display:flex; align-items:center;">
+          <span style="font-weight:800; font-size:clamp(48px,10vw,104px); letter-spacing:-.05em; color:#16332B; line-height:1;">relev</span>
+          <svg width="69" height="104" viewBox="0 0 69 104" style="margin:0 -2px; width:clamp(32px,6.6vw,69px); height:auto;" aria-hidden="true">
+            <circle cx="27" cy="63" r="22" fill="none" stroke="#0E8C7F" stroke-width="10.5" style="animation:rv-handoff 4.2s cubic-bezier(.25,1,.5,1) infinite;"></circle>
+            <circle cx="41" cy="63" r="22" fill="none" stroke="#FF5A3C" stroke-width="10.5" style="animation:rv-handoff-b 4.2s cubic-bezier(.25,1,.5,1) infinite;"></circle>
+          </svg>
+          <span style="font-weight:600; font-size:clamp(30px,6vw,62px); letter-spacing:-.04em; color:#0A5F57; line-height:1; margin-left:14px; align-self:flex-end; padding-bottom:6px;">studio</span>
+        </div>
+      </div>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-top:16px; max-width:680px;">La <strong>o</strong> final es doble: dos círculos que se solapan, uno entregándole la posta al otro. Es el <em>relevo</em> — y la raíz latina <em>relevare</em>, hacer ligero lo que pesa. <strong>studio</strong> baja de peso y se apoya en la línea base; nunca compite con el wordmark.</p>
+    </div>
+  </section>
+
+  <!-- 01 COLOR -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">01 — Color</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:6px;">Paleta</h2>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-bottom:26px; max-width:680px;">Cada tono tiene su lugar, cero drift. El <strong>ink</strong> verde pino es tinta y paneles oscuros; el <strong>coral</strong> es el acento de acción; el <strong>teal</strong> es la capa de criterio y método; los off-white dan la calidez del papel. Paleta de casa: los productos la heredan y solo cambian el acento.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:12px;">
+        <div style="grid-column:1/-1; font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089;">Ink (tinta · paneles)</div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#1E4034;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">ink-100</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#1E4034</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#16332B;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">ink-200</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#16332B</div></div></div>
+
+        <div style="grid-column:1/-1; font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin-top:10px;">Off-white (fondos)</div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#fbfbf3; border-bottom:1px solid rgba(0,0,0,.06);"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">off-white-100</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#fbfbf3</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#fffff3; border-bottom:1px solid rgba(0,0,0,.06);"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">off-white-200</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#fffff3</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#f0f0e2;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">off-white-300</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#f0f0e2</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#deded0;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">off-white-400</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#deded0</div></div></div>
+
+        <div style="grid-column:1/-1; font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin-top:10px;">Coral (acento · acción)</div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#FFE7DF;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">coral-100</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#FFE7DF</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#FF7A5E;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">coral-200</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#FF7A5E</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#FF5A3C;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">coral-300</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#FF5A3C</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#E5431F;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">coral-400</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#E5431F</div></div></div>
+
+        <div style="grid-column:1/-1; font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin-top:10px;">Teal (criterio · método)</div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#E2F0EC;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">teal-100</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#E2F0EC</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#7FC9BC;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">teal-300</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#7FC9BC</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#0E8C7F;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">teal-500</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#0E8C7F</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#0A5F57;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">teal-600</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#0A5F57</div></div></div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:12px; overflow:hidden;"><div style="height:62px; background:#063B36;"></div><div style="padding:9px 11px;"><div style="font-size:12.5px; font-weight:600;">teal-800</div><div style="font-size:11px; opacity:.6; font-family:ui-monospace,monospace; margin-top:2px;">#063B36</div></div></div>
+      </div>
+
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin:28px 0 12px;">Gradientes de marca</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;">
+        <div style="height:96px; border-radius:16px; display:flex; align-items:flex-end; padding:12px; color:#fff; font-size:11px; font-family:ui-monospace,monospace; background:linear-gradient(135deg,#0E8C7F 0%,#063B36 100%);"><span style="background:rgba(0,0,0,.28); padding:3px 7px; border-radius:5px;">teal-gradient</span></div>
+        <div style="height:96px; border-radius:16px; display:flex; align-items:flex-end; padding:12px; color:#fff; font-size:11px; font-family:ui-monospace,monospace; background:linear-gradient(137deg,#1E4034 0%,#063B36 100%);"><span style="background:rgba(0,0,0,.28); padding:3px 7px; border-radius:5px;">ink-gradient</span></div>
+        <div style="height:96px; border-radius:16px; display:flex; align-items:flex-end; padding:12px; color:#fff; font-size:11px; font-family:ui-monospace,monospace; background:linear-gradient(50deg,#FFE7DF -30%,#FF7A5E 45%,#E5431F 100%);"><span style="background:rgba(0,0,0,.28); padding:3px 7px; border-radius:5px;">warm-gradient</span></div>
+        <div style="height:96px; border-radius:16px; display:flex; align-items:flex-end; padding:12px; color:#fff; font-size:11px; font-family:ui-monospace,monospace; background:linear-gradient(224deg,#0A5F57 -26%,#FF7A5E 90%,#FF5A3C 122%);"><span style="background:rgba(0,0,0,.28); padding:3px 7px; border-radius:5px;">signal-gradient</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 TYPOGRAPHY -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">02 — Tipografía · Plus Jakarta Sans</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:6px;">Escala</h2>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-bottom:26px; max-width:680px;">Regla de oro del sistema: tracking <strong>−0.05em constante</strong> en todos los headers (es lo que da el look apretado y preciso). Los overlines invierten a tracking positivo + uppercase. Body en peso 500 para lectura sostenida.</p>
+
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">header-1<br>62px · 800 · −3.1px</span><span style="font-weight:800; letter-spacing:-.05em; white-space:nowrap; font-size:62px;">Relevo Studio</span></div>
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; border-top:1px dashed rgba(22,51,43,.14); overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">header-4<br>48px · 700 · −2.4px</span><span style="font-weight:700; letter-spacing:-.05em; white-space:nowrap; font-size:48px;">No consultamos. Construimos.</span></div>
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; border-top:1px dashed rgba(22,51,43,.14); overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">header-6<br>40px · 700 · −2px</span><span style="font-weight:700; letter-spacing:-.05em; white-space:nowrap; font-size:40px;">Estrategia, producto e IA</span></div>
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; border-top:1px dashed rgba(22,51,43,.14); overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">header-7<br>32px · 600 · −1.6px</span><span style="font-weight:600; letter-spacing:-.05em; white-space:nowrap; font-size:32px;">Del diagnóstico al sistema andando</span></div>
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; border-top:1px dashed rgba(22,51,43,.14); overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">subheader-1<br>24px · 600 · 140%</span><span style="font-weight:600; letter-spacing:-.02em; white-space:nowrap; font-size:24px;">Hacer ligero lo que pesa en la operación</span></div>
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; border-top:1px dashed rgba(22,51,43,.14); overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">body-reg<br>16px · 500 · 150%</span><span style="font-weight:500; letter-spacing:-.01em; white-space:nowrap; font-size:16px;">Entregamos sistemas que quedan funcionando, no presentaciones.</span></div>
+      <div style="display:flex; align-items:baseline; gap:20px; padding:16px 0; border-top:1px dashed rgba(22,51,43,.14); overflow:hidden;"><span style="font-family:ui-monospace,monospace; font-size:11px; opacity:.55; width:158px; flex-shrink:0; line-height:1.5;">overline<br>12px · 600 · +1.2px</span><span style="font-weight:600; letter-spacing:1.2px; text-transform:uppercase; white-space:nowrap; font-size:12px; color:#0E8C7F;">Método Relevo</span></div>
+    </div>
+  </section>
+
+  <!-- 03 MOTION -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">03 — Animaciones · en vivo</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:6px;">Catálogo de motion</h2>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-bottom:26px; max-width:680px;">El diferenciador. Todo corre con CSS nativo y easing firma <code>easeOutQuart · cubic-bezier(.25,1,.5,1)</code>; en el sitio real se disparan con scroll vía <code>animation-timeline: view()</code>. Aquí corren en loop para inspección.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;">
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(22,51,43,.025) 9px,rgba(22,51,43,.025) 18px);"><span style="display:block; font-size:30px; font-weight:700; letter-spacing:-.04em; animation:rv-reveal 4.2s cubic-bezier(.25,1,.5,1) infinite;">Reveal</span></div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">reveal-from-center</div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">clip-path inset 50%→0<br>1s · easeOutQuart</div></div>
+        </div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:flex-end; justify-content:center; overflow:hidden; background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(22,51,43,.025) 9px,rgba(22,51,43,.025) 18px);"><div style="overflow:hidden; padding-bottom:34px;"><span style="display:block; font-size:30px; font-weight:700; letter-spacing:-.04em; animation:rv-text 4.2s cubic-bezier(.25,1,.5,1) infinite;">Text reveal</span></div></div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">text-reveal</div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">translateY 110%→0 + máscara<br>1s · easeOutQuart</div></div>
+        </div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#16332B;"><span style="font-size:30px; font-weight:700; letter-spacing:-.04em;"><span style="display:inline-block; animation:rv-letter 4.2s cubic-bezier(.25,1,.5,1) infinite; animation-delay:0s;">R</span><span style="display:inline-block; animation:rv-letter 4.2s cubic-bezier(.25,1,.5,1) infinite; animation-delay:.06s;">e</span><span style="display:inline-block; animation:rv-letter 4.2s cubic-bezier(.25,1,.5,1) infinite; animation-delay:.12s;">l</span><span style="display:inline-block; animation:rv-letter 4.2s cubic-bezier(.25,1,.5,1) infinite; animation-delay:.18s;">e</span><span style="display:inline-block; animation:rv-letter 4.2s cubic-bezier(.25,1,.5,1) infinite; animation-delay:.24s;">v</span><span style="display:inline-block; animation:rv-letter 4.2s cubic-bezier(.25,1,.5,1) infinite; animation-delay:.3s;">o</span></span></div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">letter-reveal</div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">color coral→off-white, stagger<br>.5s · easeOutQuart</div></div>
+        </div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(22,51,43,.025) 9px,rgba(22,51,43,.025) 18px);"><div style="background:#16332B; color:#FFE7DF; padding:14px 22px; border-radius:14px; font-weight:600; animation:rv-mask 4.2s cubic-bezier(.4,0,.2,1) infinite;">Mask slide-in</div></div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">mask-slide-in</div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">translateY + opacity<br>1s · easeInOut</div></div>
+        </div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(22,51,43,.025) 9px,rgba(22,51,43,.025) 18px);"><div style="background:#FF5A3C; color:#fff; padding:14px 22px; border-radius:14px; font-weight:600; animation:rv-grow 4.2s cubic-bezier(.25,1,.5,1) infinite;">Grow in</div></div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">grow-in</div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">scale .5→1 + opacity<br>1s · easeOutQuart</div></div>
+        </div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(22,51,43,.025) 9px,rgba(22,51,43,.025) 18px);"><div style="background:#063B36; color:#fff; padding:14px 22px; border-radius:14px; font-weight:600; animation:rv-slide 4.2s cubic-bezier(0,0,.2,1) infinite;">Slide bottom</div></div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">slide-in-from-bottom</div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">translateY 33%→0<br>1s · ease-out</div></div>
+        </div>
+        <div style="border:1px solid rgba(22,51,43,.12); border-radius:18px; overflow:hidden; background:#fbfbf3;">
+          <div style="height:140px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fffff3;">
+            <svg width="120" height="70" viewBox="0 0 120 80" aria-hidden="true">
+              <circle cx="52" cy="40" r="24" fill="none" stroke="#0E8C7F" stroke-width="10" style="animation:rv-handoff 4.2s cubic-bezier(.25,1,.5,1) infinite;"></circle>
+              <circle cx="68" cy="40" r="24" fill="none" stroke="#FF5A3C" stroke-width="10" style="animation:rv-handoff-b 4.2s cubic-bezier(.25,1,.5,1) infinite;"></circle>
+            </svg>
+          </div>
+          <div style="padding:12px 14px; border-top:1px solid rgba(22,51,43,.1);"><div style="font-weight:600; font-size:14px;">handoff <span style="font-family:'Hanken Grotesk'; font-size:11px; font-weight:600; color:#E5431F; letter-spacing:.06em; text-transform:uppercase;">· firma</span></div><div style="font-family:ui-monospace,monospace; font-size:11px; opacity:.6; margin-top:3px; line-height:1.5;">isotipo: los círculos se cruzan<br>4.2s · easeOutQuart · loop</div></div>
+        </div>
+      </div>
+
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin:28px 0 12px;">Marquee (loop infinito · qué hacemos)</div>
+      <div style="overflow:hidden; width:100%;">
+        <div style="display:flex; gap:14px; width:max-content; animation:rv-marquee 20s linear infinite;">
+          <span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Estrategia ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Producto ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">IA aplicada ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Automatización ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Diseño ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Implementación ↗</span>
+          <span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Estrategia ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Producto ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">IA aplicada ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Automatización ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Diseño ↗</span><span style="background:#16332B; color:#FFE7DF; padding:10px 20px; border-radius:999px; font-weight:600; white-space:nowrap;">Implementación ↗</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 EASINGS -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">04 — Easings</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:6px;">Curvas de movimiento</h2>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-bottom:22px; max-width:680px;">Cinco curvas tokenizadas. La firma es <strong>easeOutQuart</strong> (entra rápido, desacelera suave). Overshoot y bounce solo para micro-interacciones de estado; nunca en secciones donde se juega la credibilidad.</p>
+      <div>
+        <div style="display:grid; grid-template-columns:minmax(150px,210px) 1fr; gap:16px; align-items:center; padding:9px 0;"><div style="font-family:ui-monospace,monospace; font-size:12px;"><b style="font-family:'Plus Jakarta Sans'; font-size:13px; display:block; margin-bottom:2px; letter-spacing:-.01em;">quart (firma)</b>cubic-bezier(.25,1,.5,1)</div><div style="position:relative; height:34px; background:#f0f0e2; border-radius:999px; overflow:hidden;"><div style="position:absolute; top:5px; width:24px; height:24px; border-radius:50%; background:#FF5A3C; animation:rv-ease 1.6s cubic-bezier(.25,1,.5,1) infinite alternate;"></div></div></div>
+        <div style="display:grid; grid-template-columns:minmax(150px,210px) 1fr; gap:16px; align-items:center; padding:9px 0;"><div style="font-family:ui-monospace,monospace; font-size:12px;"><b style="font-family:'Plus Jakarta Sans'; font-size:13px; display:block; margin-bottom:2px; letter-spacing:-.01em;">in-out</b>cubic-bezier(.4,0,.2,1)</div><div style="position:relative; height:34px; background:#f0f0e2; border-radius:999px; overflow:hidden;"><div style="position:absolute; top:5px; width:24px; height:24px; border-radius:50%; background:#FF5A3C; animation:rv-ease 1.6s cubic-bezier(.4,0,.2,1) infinite alternate;"></div></div></div>
+        <div style="display:grid; grid-template-columns:minmax(150px,210px) 1fr; gap:16px; align-items:center; padding:9px 0;"><div style="font-family:ui-monospace,monospace; font-size:12px;"><b style="font-family:'Plus Jakarta Sans'; font-size:13px; display:block; margin-bottom:2px; letter-spacing:-.01em;">overshoot</b>cubic-bezier(.34,1.26,.64,1)</div><div style="position:relative; height:34px; background:#f0f0e2; border-radius:999px; overflow:hidden;"><div style="position:absolute; top:5px; width:24px; height:24px; border-radius:50%; background:#0E8C7F; animation:rv-ease 1.6s cubic-bezier(.34,1.26,.64,1) infinite alternate;"></div></div></div>
+        <div style="display:grid; grid-template-columns:minmax(150px,210px) 1fr; gap:16px; align-items:center; padding:9px 0;"><div style="font-family:ui-monospace,monospace; font-size:12px;"><b style="font-family:'Plus Jakarta Sans'; font-size:13px; display:block; margin-bottom:2px; letter-spacing:-.01em;">bounce</b>cubic-bezier(.175,.885,.32,1.2)</div><div style="position:relative; height:34px; background:#f0f0e2; border-radius:999px; overflow:hidden;"><div style="position:absolute; top:5px; width:24px; height:24px; border-radius:50%; background:#0E8C7F; animation:rv-ease 1.6s cubic-bezier(.175,.885,.32,1.2) infinite alternate;"></div></div></div>
+        <div style="display:grid; grid-template-columns:minmax(150px,210px) 1fr; gap:16px; align-items:center; padding:9px 0;"><div style="font-family:ui-monospace,monospace; font-size:12px;"><b style="font-family:'Plus Jakarta Sans'; font-size:13px; display:block; margin-bottom:2px; letter-spacing:-.01em;">carousel</b>cubic-bezier(.65,0,.35,1)</div><div style="position:relative; height:34px; background:#f0f0e2; border-radius:999px; overflow:hidden;"><div style="position:absolute; top:5px; width:24px; height:24px; border-radius:50%; background:#16332B; animation:rv-ease 1.6s cubic-bezier(.65,0,.35,1) infinite alternate;"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 RADII & SHADOWS -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">05 — Radios y sombras</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:6px;">Forma y elevación</h2>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-bottom:26px; max-width:680px;">Radios generosos (paneles a 32–40px) y full-round en pills. Dos sombras tokenizadas: card para UI flotante y CTA para botones.</p>
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin-bottom:14px;">Radios</div>
+      <div style="display:flex; gap:22px; flex-wrap:wrap; margin-bottom:32px;">
+        <div style="width:96px;"><div style="height:70px; background:rgba(255,90,60,.12); border:1.5px solid #FF5A3C; border-radius:14px;"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">sm · 14px</div></div>
+        <div style="width:96px;"><div style="height:70px; background:rgba(255,90,60,.12); border:1.5px solid #FF5A3C; border-radius:20px;"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">md · 20px</div></div>
+        <div style="width:96px;"><div style="height:70px; background:rgba(255,90,60,.12); border:1.5px solid #FF5A3C; border-radius:32px;"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">lg · 32px</div></div>
+        <div style="width:96px;"><div style="height:70px; background:rgba(255,90,60,.12); border:1.5px solid #FF5A3C; border-radius:40px;"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">xl · 40px</div></div>
+        <div style="width:96px;"><div style="height:70px; background:rgba(255,90,60,.12); border:1.5px solid #FF5A3C; border-radius:999px;"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">pill</div></div>
+      </div>
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin-bottom:14px;">Sombras</div>
+      <div style="display:flex; gap:22px; flex-wrap:wrap;">
+        <div style="width:130px;"><div style="height:70px; background:#fbfbf3; border-radius:18px; box-shadow:0 4px 16px rgba(22,51,43,.22);"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">shadow-cta</div></div>
+        <div style="width:130px;"><div style="height:70px; background:#fbfbf3; border-radius:18px; box-shadow:0 24px 64px rgba(22,51,43,.20),0 4px 16px rgba(22,51,43,.10);"></div><div style="font-family:ui-monospace,monospace; font-size:11px; margin-top:8px; opacity:.6;">shadow-card</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 COMPONENTS -->
+  <section style="border-bottom:1px solid rgba(22,51,43,.12);">
+    <div style="max-width:1080px; margin:0 auto; padding:52px 28px;">
+      <p style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#E5431F; margin-bottom:8px;">06 — Componentes</p>
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-.03em; margin-bottom:6px;">Patrones</h2>
+      <p style="font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; margin-bottom:26px; max-width:680px;">Pills full-round con flecha ↗ (se desplaza en hover), eyebrows en coral, paneles de color sólido con la flecha ↙ decorativa, y el componente propio de Relevo: status pills de estado de proyecto.</p>
+
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin-bottom:14px;">Botones</div>
+      <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:26px;">
+        <a href="#" class="rv-btn" style="background:#16332B; color:#FFE7DF;">Agendar diagnóstico <span>↗</span></a>
+        <a href="#" class="rv-btn" style="background:#f0f0e2; color:#16332B;">Ver cómo trabajamos <span>↗</span></a>
+        <a href="#" class="rv-btn" style="background:#7FC9BC; color:#063B36;">Conocer Workieo <span>↗</span></a>
+      </div>
+
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin:22px 0 14px;">Status pills · estado de proyecto</div>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:26px;">
+        <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; font-weight:600; font-size:14px; background:#E2F0EC; color:#0A5F57;"><span style="width:8px; height:8px; border-radius:50%; background:#0E8C7F; display:inline-block; animation:rv-pulse 2s ease-in-out infinite;"></span>En construcción</span>
+        <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; font-weight:600; font-size:14px; background:#FFE7DF; color:#E5431F;"><span style="width:8px; height:8px; border-radius:50%; background:#FF5A3C; display:inline-block;"></span>Esperando definición</span>
+        <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; font-weight:600; font-size:14px; background:#f0f0e2; color:#5B6B63;"><span style="width:8px; height:8px; border-radius:50%; background:#8A9089; display:inline-block;"></span>Entregado</span>
+        <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; font-weight:600; font-size:14px; background:#16332B; color:#FFE7DF;">Sprint 3 · día 12</span>
+      </div>
+
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin:22px 0 14px;">Paneles de sección</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:26px;">
+        <div style="border-radius:32px; padding:28px; color:#fffff3; min-height:180px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 24px 64px rgba(22,51,43,.20),0 4px 16px rgba(22,51,43,.10); background:#FF5A3C;"><span style="align-self:flex-end; font-size:24px; opacity:.85;">↙</span><h3 style="font-size:24px; font-weight:700; letter-spacing:-.03em; line-height:1.1;">Estrategia que se implementa</h3></div>
+        <div style="border-radius:32px; padding:28px; color:#fffff3; min-height:180px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 24px 64px rgba(22,51,43,.20),0 4px 16px rgba(22,51,43,.10); background:#0A5F57;"><span style="align-self:flex-end; font-size:24px; opacity:.85;">↙</span><h3 style="font-size:24px; font-weight:700; letter-spacing:-.03em; line-height:1.1;">IA aplicada a la operación real</h3></div>
+        <div style="border-radius:32px; padding:28px; color:#fffff3; min-height:180px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 24px 64px rgba(22,51,43,.20),0 4px 16px rgba(22,51,43,.10); background:#16332B;"><span style="align-self:flex-end; font-size:24px; opacity:.85;">↙</span><h3 style="font-size:24px; font-weight:700; letter-spacing:-.03em; line-height:1.1;">Producto de punta a punta</h3></div>
+      </div>
+
+      <div style="font-family:'Hanken Grotesk'; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8A9089; margin:22px 0 14px;">Logotipo · usos</div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:stretch;">
+        <div style="flex:1; min-width:240px; background:#fbfbf3; border:1px solid rgba(22,51,43,.1); border-radius:24px; padding:32px; display:flex; align-items:center; justify-content:center;">
+          <div style="display:flex; align-items:center;"><span style="font-weight:800; font-size:38px; letter-spacing:-.05em; color:#16332B;">relev</span><svg width="26" height="38" viewBox="0 0 69 104" style="margin:0 -1px;" aria-hidden="true"><circle cx="27" cy="63" r="22" fill="none" stroke="#0E8C7F" stroke-width="10.5"></circle><circle cx="41" cy="63" r="22" fill="none" stroke="#FF5A3C" stroke-width="10.5"></circle></svg><span style="font-weight:600; font-size:23px; letter-spacing:-.04em; color:#0A5F57; margin-left:7px;">studio</span></div>
+        </div>
+        <div style="flex:1; min-width:240px; background:#16332B; border-radius:24px; padding:32px; display:flex; align-items:center; justify-content:center;">
+          <div style="display:flex; align-items:center;"><span style="font-weight:800; font-size:38px; letter-spacing:-.05em; color:#fffff3;">relev</span><svg width="26" height="38" viewBox="0 0 69 104" style="margin:0 -1px;" aria-hidden="true"><circle cx="27" cy="63" r="22" fill="none" stroke="#2FB39F" stroke-width="10.5"></circle><circle cx="41" cy="63" r="22" fill="none" stroke="#FF5A3C" stroke-width="10.5"></circle></svg><span style="font-weight:600; font-size:23px; letter-spacing:-.04em; color:#7FC9BC; margin-left:7px;">studio</span></div>
+        </div>
+        <div style="width:120px; min-height:110px; border-radius:24px; background:#FFE7DF; display:flex; align-items:center; justify-content:center;">
+          <svg width="70" height="46" viewBox="0 0 120 80" aria-hidden="true"><circle cx="52" cy="40" r="26" fill="none" stroke="#0E8C7F" stroke-width="10"></circle><circle cx="68" cy="40" r="26" fill="none" stroke="#FF5A3C" stroke-width="10"></circle></svg>
+        </div>
+        <div style="width:120px; min-height:110px; border-radius:24px; background:#16332B; display:flex; align-items:center; justify-content:center;">
+          <svg width="70" height="46" viewBox="0 0 120 80" aria-hidden="true"><circle cx="52" cy="40" r="26" fill="none" stroke="#2FB39F" stroke-width="10"></circle><circle cx="68" cy="40" r="26" fill="none" stroke="#FF5A3C" stroke-width="10"></circle></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="max-width:1080px; margin:0 auto; padding:40px 28px 72px; font-family:'Hanken Grotesk'; color:#4C5A52; font-size:14px; line-height:1.6;">
+    <strong style="color:#16332B;">Nota:</strong> tipografía en Plus Jakarta Sans (libre, licenciable). Este es el sistema base de la casa —tokens, motion scroll-driven y estructura de paneles—; los productos lo heredan y solo cambian el acento y la semántica, como hace Workieo. Marca en dirección <strong style="color:#16332B;">Sage × Creator</strong>, del latín <em>relevare</em>: hacer ligero lo que pesa.
+  </div>
+
+</div>
+
+</body>
+</html>
