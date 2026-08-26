@@ -20,11 +20,23 @@ declare module "express-serve-static-core" {
   }
 }
 
-export function requireApiKey(store: ApiKeyStore, limiter: FixedWindowRateLimiter, defaultLimit: number) {
+const KEY_CACHE_MS = 60_000;
+
+/** Caché en memoria de keys validadas: ahorra una ida a la base por petición. Revocar una key tarda hasta un minuto en verse. */
+export function requireApiKey(store: ApiKeyStore, limiter: FixedWindowRateLimiter, defaultLimit: number, cacheMs = KEY_CACHE_MS) {
+  const cache = new Map<string, { record: ApiKeyRecord | null; until: number }>();
+  const lookup = async (hash: string): Promise<ApiKeyRecord | null> => {
+    const hit = cache.get(hash);
+    if (hit && hit.until > Date.now()) return hit.record;
+    const record = await store.findByHash(hash);
+    cache.set(hash, { record, until: Date.now() + cacheMs });
+    if (cache.size > 1000) cache.clear();
+    return record;
+  };
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const key = extractApiKey({ authorization: req.header("authorization"), "x-api-key": req.header("x-api-key") });
     if (!key) return sendError(res, { status: 401, code: "unauthorized", message: "falta la API key (Authorization: Bearer <key> o X-API-Key)" });
-    const record = await store.findByHash(hashApiKey(key));
+    const record = await lookup(hashApiKey(key));
     if (!record || !record.active) return sendError(res, { status: 403, code: "forbidden", message: "API key inválida o desactivada" });
     const rl = limiter.check(record.id, record.rateLimitPerMinute || defaultLimit);
     res.setHeader("X-RateLimit-Limit", String(rl.limit));

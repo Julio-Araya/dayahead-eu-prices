@@ -14,7 +14,7 @@ export function getPool(databaseUrl: string): pg.Pool {
     pool = new Pool({
       connectionString: databaseUrl,
       max: 5, // serverless: pocas conexiones por instancia; Supabase recomienda el pooler (puerto 6543)
-      idleTimeoutMillis: 10_000,
+      idleTimeoutMillis: 300_000, // reabrir TLS hacia Supabase cuesta segundos; mantener la conexión viva
       ssl: databaseUrl.includes("localhost") || databaseUrl.includes("127.0.0.1") ? undefined : { rejectUnauthorized: false },
     });
   }
