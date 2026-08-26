@@ -21,7 +21,7 @@ export default function App() {
     <>
       <Header page={page} onNavigate={setPage} />
       {page === "prices" ? <PricesPage countries={countries} status={status} /> : <QualityPage />}
-      <footer className="container footer">Fuente: ENTSO-E (ES, RO), SMARD (DE), PSE (PL); tipo de cambio BCE. Ingesta diaria a las 16:00 UTC desde Microsoft Fabric.</footer>
+      <footer className="container footer">Fuente: ENTSO-E (ES, RO), SMARD (DE), PSE (PL); tipo de cambio BCE. Ingesta diaria a las 18:00 UTC desde Microsoft Fabric.</footer>
     </>
   );
 }

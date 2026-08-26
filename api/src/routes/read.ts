@@ -4,7 +4,7 @@ import type { PriceReader } from "../readers/types.js";
 import { PricesQuery, getPrices } from "../services/prices.js";
 import { sendError } from "./middleware.js";
 
-const STALE_AFTER_HOURS = 26; // una corrida diaria a las 16:00 UTC; más de 26 h sin intento = desactualizado
+const STALE_AFTER_HOURS = 26; // una corrida diaria a las 18:00 UTC; más de 26 h sin intento = desactualizado
 
 export function readRouter(reader: PriceReader): Router {
   const r = Router();
