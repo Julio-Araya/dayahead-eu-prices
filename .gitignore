@@ -12,3 +12,4 @@ docs/Prueba técnica_AI & Data engineer.pdf
 build/
 *.egg-info/
 .pytest_cache/
+fabric/dist/
