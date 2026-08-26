@@ -4,19 +4,16 @@ Extra mile 4 del BRIEF. Paso a paso en el navegador. Verificado contra la docume
 
 Tiempo estimado: 30-40 minutos.
 
-## 0. Una tabla unida para la comparativa (opcional pero recomendado)
+## 0. La tabla unida para la comparativa: parámetro `build_gold_table`
 
-Direct Lake no permite consultas Power Query ni vistas SQL sin caer a DirectQuery, y el modelo tiene una tabla de precios por país. Para un visual multipaís en un solo gráfico conviene una tabla **gold** con las cuatro unidas. Es una celda al final de `nb_dayahead_ingest`, idempotente (se reescribe entera en cada corrida; son ~12.000 filas con 30 días):
+Direct Lake no permite consultas Power Query ni vistas SQL sin caer a DirectQuery, y el modelo tiene una tabla de precios por país. Para un visual multipaís en un solo gráfico conviene una tabla **gold** con las cuatro unidas: `prices_all` (D24).
 
-```python
-# Tabla gold para BI: unión de las tablas por país (D24). Se reescribe entera en cada corrida.
-tables = [t for _, t in configs]
-union_sql = " UNION ALL ".join(f"SELECT * FROM {t}" for t in tables)
-spark.sql(f"CREATE OR REPLACE TABLE prices_all USING DELTA COMMENT 'Union de las tablas de precios por pais para Power BI (gold). Se regenera en cada corrida.' AS {union_sql}")
-print(f"prices_all: {spark.table('prices_all').count()} filas desde {tables}")
-```
+El notebook `nb_dayahead_ingest` la genera cuando el parámetro **`build_gold_table = True`** (apagado por defecto): al final de cada corrida reescribe `prices_all` entera con `CREATE OR REPLACE TABLE … AS SELECT * FROM prices_es UNION ALL …` (~12.000 filas con 30 días; tarda segundos). Para activarla:
 
-Pégala como última celda de código antes del resumen, ejecuta el notebook una vez y comprueba que aparece `prices_all` en `Tables`. Si prefieres no tocar el notebook, el reporte funciona igual con una página por país (paso 3).
+1. En el pipeline `pl_dayahead_daily` → actividad Notebook → **Base parameters** → agrega `build_gold_table` de tipo **Bool** con valor `true` (o edita el valor si ya aparece por auto-populate). **Save**.
+2. Corre el pipeline una vez (o el notebook a mano con el parámetro cambiado en su celda). En el Lakehouse aparece `prices_all`; con `Refresh` en `Tables` si no se ve.
+
+Si prefieres no activarla, el reporte funciona igual con una página por país (paso 3).
 
 ## 1. Crear el modelo semántico
 

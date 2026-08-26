@@ -1,5 +1,7 @@
 # Guía: integración Git del workspace de Fabric
 
+> **Decisión tomada (D23): opción B, el workspace no se conecta a Git.** Esta guía queda como referencia de cómo se haría en Grenergy cuando los secretos vivan en Azure Key Vault y no en la Biblioteca de variables.
+
 Extra mile 5 del BRIEF. Paso a paso en el navegador, con lo que deberías ver al terminar cada paso. Verificado contra la documentación oficial de Fabric (julio 2026); lo marcado **[hipótesis]** no se pudo confirmar sin acceso.
 
 ## 0. Decide antes de empezar: qué se versiona y dónde
@@ -14,7 +16,7 @@ Eso choca con la regla de CLAUDE.md (ningún secreto en el repo) si el destino e
 | **B. No conectar Git** | Se documenta en el documento técnico por qué: el ítem que lleva los secretos no se puede excluir y no hay tipo secreto ni Key Vault sin registro de aplicación (D1) | Segura y defendible; pierde el extra mile |
 | C. Conectar al repo de entrega | Publica el token y el secreto | Descartada |
 
-Elige A o B. Lo que sigue es A.
+Julio eligió **B** (D23). Lo que sigue describe A, por si en el futuro se hace con los secretos fuera de la biblioteca.
 
 ## 1. Prerrequisitos
 
