@@ -128,6 +128,16 @@ Detalle de D3. La clave (`dap_` + 24 bytes aleatorios en base64url) se muestra u
 - `countries` en Postgres es el espejo de `sources_config`: agregar un país a la API es una fila (`002_seed_countries.sql` hace upsert, así que se puede reaplicar).
 - Decimales viajan y se guardan como texto (`numeric` en Postgres, `string` en JSON): sin pérdida por coma flotante en ninguna capa.
 
+## D21. Interfaz: BFF, gráfica escalonada en EUR, cinco estados, paleta por país (2026-08-26)
+
+- **BFF en el mismo dominio** (`web/bff/handler.ts`): el navegador llama a `/api/*`; el BFF agrega la API key y reenvía solo rutas de lectura (allowlist), traduce 401/403 de la API a 403 ("sin permiso") y responde 503 si no está configurado. El mismo handler corre como middleware de Vite en desarrollo y como función serverless en Vercel, así no hay dos implementaciones.
+- **Comparativa siempre en EUR.** El toggle de moneda cambia los paneles por país y la tabla (Polonia en PLN), nunca la comparativa: dos monedas sobre un mismo eje es un doble eje encubierto, la escala inventa una relación que no existe.
+- **Líneas escalonadas** (`stepPath`): un precio day-ahead es constante durante su intervalo; interpolar entre puntos dibujaría valores que nunca existieron. La línea se corta en huecos reales en vez de unirlos.
+- **Horas en UTC** en ejes, tooltip y tabla, igual que en la base de datos. Mostrar hora local de cada mercado en una comparativa de cuatro zonas induce a error; queda como evolución posible un selector de zona.
+- **Cinco estados** (CLAUDE.md): `loading` conserva el render anterior atenuado (sin parpadeo), `empty` solo tras 200 con cero filas, `error`, `forbidden` (credencial del BFF rechazada) y **desactualizado** como banner sobre los datos cuando `/v1/status` marca más de 26 h sin corrida.
+- **Paleta por país** validada con `dataviz/validate_palette.js` sobre la superficie `#fbfbf3` del design system (banda de luminosidad, piso de croma, separación CVD, contraste): ES `#0E9C8B`, RO `#E5431F`, DE `#7A5AA6`, PL `#B8860B`. El teal-500 de marca (`#0E8C7F`) no supera el piso de croma; ciruela y ámbar son extensión del producto porque el sistema solo trae tres familias. Asignación fija por país, nunca por orden de aparición; ocultar una serie no recolorea las demás.
+- **Sin librerías de gráficas**: SVG a mano (~150 líneas), en línea con "sin librerías de componentes externas" y con la guía de marcas (líneas de 2 px, grilla hairline, marcadores con anillo de superficie, leyenda siempre presente con ≥ 2 series, etiquetas al final solo si no chocan, tabla gemela).
+
 ---
 
 ## Pendientes (deudas registradas, sin decidir)
