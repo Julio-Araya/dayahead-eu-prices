@@ -123,3 +123,10 @@ CREATE TABLE IF NOT EXISTS fx_rates (
   fetched_at_utc TIMESTAMP     COMMENT 'Corrida que obtuvo o refresco la tasa'
 ) USING DELTA
 COMMENT 'Tasas diarias de referencia del BCE usadas para convertir a EUR. Upsert por (rate_date, currency).';
+
+-- -----------------------------------------------------------------------------
+-- Tabla gold opcional para Power BI (D24), creada por el notebook cuando build_gold_table = true:
+--   CREATE OR REPLACE TABLE prices_all USING DELTA AS
+--     SELECT * FROM prices_es UNION ALL SELECT * FROM prices_ro UNION ALL ... (una por fila activa de sources_config)
+-- Mismo esquema que las tablas por pais. Se regenera entera en cada corrida; no es fuente de verdad.
+-- -----------------------------------------------------------------------------

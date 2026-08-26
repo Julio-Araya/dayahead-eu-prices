@@ -13,7 +13,8 @@
 # - El token de ENTSO-E se lee de la Biblioteca de variables del workspace. Nunca de una celda.
 #
 # Parámetros (celda siguiente): `start_date`, `end_date` (YYYY-MM-DD, vacíos = ventana por defecto),
-# `countries` ("ES,RO", vacío = todos los activos en `sources_config`), `publish_to_api` (Fase 3).
+# `countries` ("ES,RO", vacío = todos los activos en `sources_config`), `publish_to_api` (Fase 3),
+# `build_gold_table` (D24: tabla `prices_all` para Power BI, apagada por defecto).
 
 # %%
 # Instala el paquete puro desde Resources. Debe ser la primera celda: en notebooks Spark, %pip
@@ -28,6 +29,7 @@ start_date = ""          # YYYY-MM-DD. Vacío = D-3 (D = fecha UTC de la corrida
 end_date = ""            # YYYY-MM-DD. Vacío = D+1
 countries = ""           # Códigos separados por coma, p. ej. "ES,RO". Vacío = todos los activos
 publish_to_api = False   # Fase 3: POST firmado con HMAC hacia la API. Apagado hasta entonces
+build_gold_table = False # D24: regenerar prices_all (unión de las tablas por país) para Power BI
 variable_library = "vl_dayahead"   # Nombre de la Biblioteca de variables con ENTSOE_TOKEN
 
 # %%
@@ -480,6 +482,32 @@ if publish_to_api:
     publish_run(all_records, control_payload)
 else:
     print("publish_to_api=False: no se publica hacia la API")
+
+# %% [markdown]
+# ## Tabla gold para Power BI (opcional, D24)
+#
+# `prices_all` = unión de las tablas de precios por país, reescrita entera en cada corrida
+# (~12.000 filas con 30 días). Direct Lake no admite vistas SQL sin caer a DirectQuery, por eso
+# se materializa. Las tablas por país siguen siendo la fuente de verdad.
+
+# %%
+GOLD_TABLE = "prices_all"
+
+def build_gold(tables) -> int:
+    union_sql = " UNION ALL ".join(f"SELECT * FROM {t}" for t in tables)
+    spark.sql(
+        f"CREATE OR REPLACE TABLE {GOLD_TABLE} USING DELTA "
+        f"COMMENT 'Union de las tablas de precios por pais para Power BI (gold, D24). Se regenera entera en cada corrida.' "
+        f"AS {union_sql}"
+    )
+    return spark.table(GOLD_TABLE).count()
+
+
+if build_gold_table:
+    gold_sources = [t for _, t in configs]
+    print(f"{GOLD_TABLE}: {build_gold(gold_sources)} filas desde {gold_sources}")
+else:
+    print(f"build_gold_table=False: no se regenera {GOLD_TABLE}")
 
 # %% [markdown]
 # ## Resumen de la corrida
