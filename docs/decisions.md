@@ -73,10 +73,46 @@ El PDF original contiene el token de ENTSO-E en texto plano. Se versiona `docs/p
 - **Deduplicación**: si un documento trae dos TimeSeries válidas para el mismo instante, gana la última. No se observó, pero el parser no debe explotar.
 - **Módulo puro**: solo biblioteca estándar (`xml.etree`, `json`, `decimal`, `datetime`, `zoneinfo`). Sin `requests`, sin Spark. Las funciones reciben bytes/dicts y devuelven listas de `PriceRecord`; el notebook hace las llamadas HTTP. La paginación de PSE recibe una función `fetch` inyectada para poder testearse con fixtures.
 
+## D16. El módulo llega al notebook como wheel en la carpeta Resources, instalado con `%pip` (2026-08-26)
+
+**Contexto.** `etl/dayahead` es un paquete puro sin dependencias que se construye con `python -m build` en `dayahead-<versión>-py3-none-any.whl`. Julio opera Fabric a mano en el navegador; cada iteración de código cuesta una vuelta manual.
+
+**Opciones evaluadas** (documentación oficial de Fabric, agosto 2026).
+
+| | Reproducibilidad | Actualizar | Cómo lo ve el revisor |
+|---|---|---|---|
+| (a) Wheel como biblioteca personalizada en un **Entorno** | La más alta: modo Full crea un snapshot estable, "recomendado para pipelines" | Subir y **publicar**: modo Full 3-6 min de publicación más 1-3 min por sesión; modo Quick publica en 5 s pero instala al arrancar la sesión | Ítem Environment en el workspace con el notebook adjunto: la forma canónica |
+| (b) Código en `Files/` del Lakehouse y `sys.path.insert` | Baja: corre lo que haya en Files, sin versión, código mezclado con datos | Arrastrar la carpeta de nuevo; frágil | Código suelto dentro de un Lakehouse |
+| (c) Módulo inlineado en el notebook | Alta pero con dos fuentes de verdad (los tests cubren `etl/dayahead`, el notebook tiene una copia) | Regenerar y reimportar el notebook | Notebook largo con una biblioteca pegada |
+| **(d) Wheel en Resources del notebook + `%pip install "builtin/dayahead-x.y.z-py3-none-any.whl"`** | Alta: versión en el nombre del archivo y en la celda; el wheel viaja con el notebook | `python -m build`, arrastrar el `.whl`, subir la versión en la celda, reiniciar sesión; sin espera de publicación | Notebook corto con una línea de instalación visible y el fuente en el repo; patrón documentado por Microsoft |
+
+**Restricciones verificadas.** Los Entornos **no aplican a notebooks Python** ("Environment integration isn't available on Python notebooks"), así que (a) obliga a notebook Spark. En ejecuciones desde pipeline la instalación inline está desactivada por defecto y hay que activar el parámetro `_inlineInstallationEnabled = True` en la actividad Notebook. La documentación desaconseja `%pip` en pipelines porque el árbol de dependencias puede variar entre corridas; nuestro wheel no tiene dependencias, por lo que ese riesgo no existe y queda documentado.
+
+**Elegida: (d).** (a) queda anotada como **paso opcional de cierre**: es el mismo wheel; adjuntar un Entorno en modo Full y borrar la línea `%pip` toma unos minutos y deja el ítem Environment visible para el revisor.
+
+## D17. Notebook PySpark, con Spark solo como escritor Delta (2026-08-26)
+
+**Contexto.** Cuatro países y unas 500 filas por día no necesitan cómputo distribuido. Fabric ofrece notebooks Python puros (un nodo de 2 vCores/16 GB, kernels 3.10-3.12, programables y orquestables desde pipeline, con `delta-rs` y `duckdb` preinstalados) y notebooks Spark.
+
+**Tradeoffs.**
+
+| | PySpark (Spark solo escribe) | Python puro (delta-rs) |
+|---|---|---|
+| Adecuación al tamaño | Sobredimensionado, pero la lógica no está en Spark: el módulo puro produce las filas y Spark solo hace `MERGE` | Tamaño justo |
+| Escritura Delta / upsert | `DeltaTable.merge` maduro; tipos `decimal` y `timestamp`; compatibilidad garantizada con el SQL endpoint y Power BI | La doc advierte que "algunas funciones de Delta Lake podrían no estar totalmente soportadas"; particularidades conocidas (hipótesis no verificables sin acceso): `timestamp_ntz` no legible por el SQL endpoint, cuidado con decimales y versión de protocolo, sin V-Order, registro de tabla por carpeta |
+| Riesgo con el plazo | Bajo | Medio: cada particularidad es depuración en vivo en el navegador |
+| Revisor | Lo esperado para "ETL en Fabric" | Muestra criterio de dimensionamiento; menos convencional |
+| Entornos | Compatibles | No disponibles |
+
+**Elegida: PySpark.** Spark no hace cómputo: el notebook convierte las filas del módulo en un DataFrame y ejecuta `MERGE` por `(country_code, ts_utc)`. El notebook Python con delta-rs queda documentado como la alternativa más barata; migrar sería cambiar solo la celda de escritura, el módulo no cambia.
+
 ---
 
 ## Pendientes (deudas registradas, sin decidir)
 
+- La Biblioteca de variables **no es un almacén de secretos**: no existe tipo secreto (tipos verificados: String, Integer, Number, Boolean, DateTime, Guid, referencias a ítems y conexiones). `ENTSOE_TOKEN` va como String, legible por quien tenga permiso de lectura sobre el ítem. Es lo que permite el acceso de la prueba; el paso siguiente en Grenergy sería Azure Key Vault con `notebookutils.credentials.getSecret`, que requiere registro de aplicación (D1).
+- Hipótesis pendientes de confirmar en el navegador (marcadas también en `docs/fabric-setup.md`): que Fabric respete la etiqueta `parameters` de la celda al importar el `.ipynb` (si no, se marca a mano con "Toggle parameter cell"); que el formato JSON de `fabric/pipeline/pl_dayahead_daily.json` coincida con el de la integración Git de pipelines (es referencia, el pipeline se crea por UI); que `requests` esté en el runtime 1.3 (lo está en todos los runtimes de Fabric conocidos; la celda de imports fallaría de forma visible si no).
+- El notebook evalúa la completitud **leyendo la tabla** después del `MERGE`, no con las filas que llegaron en la corrida. Así `load_control` refleja el estado real del Lakehouse aunque una corrida traiga menos filas que la anterior. La `source_published_at` de `load_control` se conserva si la corrida nueva no trae una (coalesce).
 - PSE: `$select` no se probó en aislamiento. Rate limits de ENTSO-E (400 req/min documentados) no probados; la corrida hace una llamada por país y ventana, muy por debajo.
 - Resample PT15M → PT60M y firma HMAC: lógica del lado de la API (Fase 3), con sus tests allá.
 - Python local 3.9 vs runtime de Fabric 3.10/3.11. El módulo evita sintaxis posterior a 3.9.

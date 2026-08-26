@@ -1,0 +1,43 @@
+{
+  "_comment": "Referencia de la definicion del pipeline pl_dayahead_daily. Se crea por la interfaz de Fabric siguiendo docs/fabric-setup.md; este JSON documenta la configuracion esperada (actividad, parametros, politica de reintento). Los ids de notebook y workspace se rellenan en el tenant. HIPOTESIS: el formato sigue el de la integracion Git de pipelines de Fabric (tipo TridentNotebook); no se pudo verificar sin acceso.",
+  "properties": {
+    "description": "Ingesta diaria de precios day-ahead (ES, RO, DE, PL). Ventana [D-3, D+1]; backfill pasando start_date y end_date.",
+    "parameters": {
+      "start_date": {"type": "string", "defaultValue": ""},
+      "end_date": {"type": "string", "defaultValue": ""},
+      "countries": {"type": "string", "defaultValue": ""}
+    },
+    "activities": [
+      {
+        "name": "Ingest day-ahead prices",
+        "type": "TridentNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.01:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 300,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "typeProperties": {
+          "notebookId": "<id de nb_dayahead_ingest>",
+          "workspaceId": "<id del workspace>",
+          "parameters": {
+            "start_date": {"value": {"value": "@pipeline().parameters.start_date", "type": "Expression"}, "type": "string"},
+            "end_date": {"value": {"value": "@pipeline().parameters.end_date", "type": "Expression"}, "type": "string"},
+            "countries": {"value": {"value": "@pipeline().parameters.countries", "type": "Expression"}, "type": "string"},
+            "publish_to_api": {"value": "false", "type": "bool"},
+            "_inlineInstallationEnabled": {"value": "true", "type": "bool"}
+          }
+        }
+      }
+    ]
+  },
+  "schedule": {
+    "_comment": "La programacion no forma parte de la definicion del pipeline; se configura en Schedule dentro del editor.",
+    "enabled": true,
+    "frequency": "Daily",
+    "time": "16:00",
+    "timeZone": "UTC"
+  }
+}
