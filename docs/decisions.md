@@ -106,6 +106,28 @@ El PDF original contiene el token de ENTSO-E en texto plano. Se versiona `docs/p
 
 **Elegida: PySpark.** Spark no hace cómputo: el notebook convierte las filas del módulo en un DataFrame y ejecuta `MERGE` por `(country_code, ts_utc)`. El notebook Python con delta-rs queda documentado como la alternativa más barata; migrar sería cambiar solo la celda de escritura, el módulo no cambia.
 
+## D18. Endpoint de ingestión firmado con HMAC SHA256, timestamp y nonce (2026-08-26)
+
+**Contexto.** Fabric publica hacia la API al final de cada corrida (D1, opción 1). El emisor es un notebook sin identidad propia; lo que puede tener es un secreto compartido.
+
+**Decisión.** `POST /v1/ingest` con cabeceras `X-Timestamp` (segundos Unix), `X-Nonce` (UUID) y `X-Signature: sha256=HMAC_SHA256(secreto, "<timestamp>.<nonce>." + cuerpo)`. El cuerpo se firma byte a byte tal como se envía (JSON compacto con claves ordenadas, decimales como texto). El servidor rechaza timestamps a más de 300 s de su reloj y nonces ya vistos (tabla `ingest_nonces`, purgada a la hora), y hace el upsert en una transacción junto con el registro del nonce: o entra todo o no entra nada.
+
+**Por qué así.** Firmar el cuerpo evita manipulación en tránsito además de autenticar; el timestamp acota el replay a una ventana corta y el nonce lo elimina dentro de ella. Es el esquema de webhooks de Stripe y GitHub, conocido por cualquier equipo. La implementación de referencia vive en `etl/dayahead/publish.py` (Python, lo usa el notebook) y `api/src/auth/hmac.ts`, con vectores de prueba compartidos para que no diverjan.
+
+**Descartado.** API key para la ingestión: no protege el cuerpo ni evita replay. mTLS: imposible de configurar desde un notebook de Fabric.
+
+## D19. API keys con hash, alcance de lectura y límite por clave (2026-08-26)
+
+Detalle de D3. La clave (`dap_` + 24 bytes aleatorios en base64url) se muestra una sola vez al crearla (`npm run create-key`); en `api_keys` queda `sha256(clave)` y un prefijo de 8 caracteres para identificarla. Viaja en `Authorization: Bearer` o `X-API-Key`. Cada clave tiene su `rate_limit_per_minute`; el contador es una ventana fija de un minuto **en memoria del proceso**. Límite conocido: en Vercel cada instancia serverless cuenta por separado, así que el tope real es por instancia. Para los consumidores previstos (una interfaz vía BFF y agentes) alcanza; el paso siguiente sería un contador en Postgres o Redis. La interfaz nunca recibe la clave: la pone su BFF (Fase 4).
+
+## D20. Lector detrás de una interfaz; resample en el servicio; una sola tabla en Postgres (2026-08-26)
+
+- `PriceReader` con dos implementaciones elegidas por `DATA_READER`: `postgres` (activa) y `fabric-graphql` (BRIEF D1, opción 3). La segunda implementa client credentials contra Entra ID y las consultas GraphQL con la convención de la API for GraphQL de Fabric (tabla pluralizada, `filter`/`first`/`orderBy`, `items`). **Hipótesis**: los nombres exactos del esquema GraphQL se confirman al crear la API en Fabric, cosa que exige un service principal que la prueba no permite. Sin credenciales, `ping()` lo dice y las lecturas responden 503.
+- El resample PT15M → PT60M (D5) se hace en el servicio de la API, no en SQL, para que los dos lectores compartan una sola implementación probada (promedio con enteros escalados, redondeo half-up a 4 decimales, `slots` por hora para señalar horas incompletas).
+- Postgres replica las cuatro tablas de Fabric en una sola `prices` con clave `(country_code, ts_utc)` e índice por `(country_code, business_date_local)`. Una tabla por país tiene sentido en el Lakehouse (enunciado de la prueba, ingestión independiente); en la capa de servicio complica cada consulta multipaís sin aportar nada.
+- `countries` en Postgres es el espejo de `sources_config`: agregar un país a la API es una fila (`002_seed_countries.sql` hace upsert, así que se puede reaplicar).
+- Decimales viajan y se guardan como texto (`numeric` en Postgres, `string` en JSON): sin pérdida por coma flotante en ninguna capa.
+
 ---
 
 ## Pendientes (deudas registradas, sin decidir)

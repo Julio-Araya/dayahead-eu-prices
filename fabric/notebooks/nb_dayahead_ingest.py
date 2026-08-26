@@ -18,7 +18,7 @@
 # Instala el paquete puro desde Resources. Debe ser la primera celda: en notebooks Spark, %pip
 # reinicia el intérprete de Python y se pierden las variables definidas antes.
 # Al actualizar el módulo: python fabric/build.py -> subir el .whl nuevo a Resources -> cambiar la versión acá.
-# MAGIC %pip install "builtin/dayahead-0.1.0-py3-none-any.whl"
+# MAGIC %pip install "builtin/dayahead-0.2.0-py3-none-any.whl"
 
 # %% parameters
 # Celda de parámetros (marcada con "Toggle parameter cell"; el pipeline inserta una celda debajo
@@ -433,19 +433,52 @@ for cfg, table in configs:
         merge_control(control_rows)
 
 # %% [markdown]
-# ## Publicación hacia la API (Fase 3, apagado)
+# ## Publicación hacia la API (Fase 3)
+#
+# Con `publish_to_api=True` el notebook envía las filas de la corrida y las filas de `load_control`
+# al endpoint `POST /v1/ingest` de la API, firmadas con HMAC SHA256 (D18). Necesita dos variables más
+# en la Biblioteca de variables: `INGEST_API_URL` (String) e `INGEST_HMAC_SECRET` (String). El módulo
+# `dayahead.publish` construye cuerpo, cabeceras y firma; acá solo se hace el POST.
 
 # %%
-def publish_to_api_stub(records) -> None:
-    """Fase 3: POST de las filas nuevas al endpoint de ingestión de la API, firmado con HMAC SHA256
-    (secreto compartido + timestamp anti-replay). Hasta entonces el flag se mantiene apagado."""
-    raise NotImplementedError("publish_to_api está reservado para la Fase 3; mantener publish_to_api=False")
+def publish_run(records, control_rows) -> None:
+    import uuid
+    from dayahead import publish  # requiere wheel >= 0.2.0
+
+    api_url = notebookutils.variableLibrary.get(f"$(/**/{variable_library}/INGEST_API_URL)")
+    secret = notebookutils.variableLibrary.get(f"$(/**/{variable_library}/INGEST_HMAC_SECRET)")
+    if not api_url or not secret:
+        raise RuntimeError(f"faltan INGEST_API_URL o INGEST_HMAC_SECRET en la Biblioteca de variables '{variable_library}'")
+    payloads = publish.build_payloads(RUN_ID, RUN_STARTED, records, control_rows)
+    for payload in payloads:
+        req = publish.build_ingest_request(api_url, secret, payload, int(time.time()), str(uuid.uuid4()))
+        last = None
+        for attempt in range(1, 4):
+            resp = requests.post(req.url, data=req.body, headers=req.headers, timeout=HTTP_TIMEOUT)
+            if resp.status_code == 200:
+                body = resp.json()
+                print(f"publicado parte {payload['part']}/{payload['parts']}: {body.get('prices_upserted')} precios, {body.get('load_control_upserted')} control")
+                break
+            last = f"HTTP {resp.status_code}: {resp.text[:300]}"
+            if resp.status_code in (400, 401, 409):
+                break  # firma, cuerpo o replay: reintentar no ayuda
+            time.sleep(5 * attempt)
+        else:
+            raise HttpError(f"publicación parte {payload['part']}: {last}")
+        if last and resp.status_code != 200:
+            raise HttpError(f"publicación parte {payload['part']}: {last}")
 
 
 if publish_to_api:
-    publish_to_api_stub(all_records)
+    control_payload = [
+        {"country_code": cc, "business_date_local": day, "expected_slots": expected, "loaded_slots": loaded, "status": status,
+         "source_published_at": published, "last_attempt_utc": RUN_STARTED,
+         "last_success_utc": RUN_STARTED if status == "complete" else None, "last_error": failures.get(cc), "run_id": RUN_ID}
+        for cc, day, status, loaded, expected, published in summary
+    ]
+    publish_run(all_records, control_payload)
 else:
-    print("publish_to_api=False: no se publica hacia la API (Fase 3)")
+    print("publish_to_api=False: no se publica hacia la API")
 
 # %% [markdown]
 # ## Resumen de la corrida

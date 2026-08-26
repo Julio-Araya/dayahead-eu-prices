@@ -25,9 +25,9 @@ python3 -m pip install build
 python3 fabric/build.py
 ```
 
-Debes ver tres líneas: el `.ipynb` generado con 19 celdas y 1 de parámetros, "DDL: 7 sentencias idénticas", y "wheel: fabric/dist/dayahead-0.1.0-py3-none-any.whl (coincide con la celda %pip)". Deja a mano:
+Debes ver tres líneas: el `.ipynb` generado con 19 celdas y 1 de parámetros, "DDL: 7 sentencias idénticas", y "wheel: fabric/dist/dayahead-0.2.0-py3-none-any.whl (coincide con la celda %pip)". Deja a mano:
 
-- `fabric/dist/dayahead-0.1.0-py3-none-any.whl`
+- `fabric/dist/dayahead-0.2.0-py3-none-any.whl`
 - `fabric/notebooks/nb_dayahead_ingest.ipynb`
 - el valor de `ENTSOE_TOKEN` de tu `.env` (lo vas a pegar una sola vez, en el paso 3).
 
@@ -53,7 +53,9 @@ Deberías ver: el explorador del Lakehouse con `Tables` y `Files` vacíos.
 2. **+ New variable**: nombre `ENTSOE_TOKEN`, tipo **String**, valor: pega el token. Nota (opcional): "Token de la ENTSO-E Transparency Platform. Lo lee nb_dayahead_ingest".
 3. **Save**.
 
-Deberías ver: una fila `ENTSOE_TOKEN | String | ●●●` en el value set **Default**, marcado como activo.
+4. Para la Fase 3 (publicación hacia la API), dos variables más, ambas **String**: `INGEST_API_URL` (URL base de la API desplegada, p. ej. `https://<proyecto>.vercel.app`) e `INGEST_HMAC_SECRET` (el mismo valor que `INGEST_HMAC_SECRET` en el entorno de la API; se genera con `openssl rand -hex 32`). Hasta que la API exista pueden quedar vacías: el notebook solo las lee si `publish_to_api=True`.
+
+Deberías ver: `ENTSOE_TOKEN | String | ●●●` (y, si ya las creaste, `INGEST_API_URL` e `INGEST_HMAC_SECRET`) en el value set **Default**, marcado como activo.
 
 Importante:
 - El notebook la busca como `$(/**/vl_dayahead/ENTSOE_TOKEN)`. La documentación dice que la referencia es sensible a mayúsculas: escribe los dos nombres exactamente así.
@@ -67,7 +69,7 @@ Importante:
 1. En el workspace: **Import → Notebook → From this computer**, elige `fabric/notebooks/nb_dayahead_ingest.ipynb`. **Upload**.
 2. Ábrelo. Arriba a la izquierda, en el selector de lenguaje, debe decir **PySpark (Python)**.
 
-Deberías ver: 19 celdas; la primera de texto con el título, la segunda con `%pip install "builtin/dayahead-0.1.0-py3-none-any.whl"`, la tercera con los parámetros.
+Deberías ver: 19 celdas; la primera de texto con el título, la segunda con `%pip install "builtin/dayahead-0.2.0-py3-none-any.whl"`, la tercera con los parámetros.
 
 ### 4.2 Marcar la celda de parámetros
 
@@ -76,9 +78,9 @@ Deberías ver: 19 celdas; la primera de texto con el título, la segunda con `%p
 ### 4.3 Subir el wheel a Resources
 
 1. Panel izquierdo del notebook → pestaña **Resources** (icono de carpeta) → carpeta **Built-in**.
-2. Arrastra `fabric/dist/dayahead-0.1.0-py3-none-any.whl` a esa carpeta (o **Upload**).
+2. Arrastra `fabric/dist/dayahead-0.2.0-py3-none-any.whl` a esa carpeta (o **Upload**).
 
-Deberías ver: `dayahead-0.1.0-py3-none-any.whl` dentro de `Built-in`. El nombre tiene que coincidir letra por letra con el de la celda `%pip`.
+Deberías ver: `dayahead-0.2.0-py3-none-any.whl` dentro de `Built-in`. El nombre tiene que coincidir letra por letra con el de la celda `%pip`.
 
 ### 4.4 Anclar el Lakehouse
 
@@ -93,7 +95,7 @@ Deberías ver: `lh_dayahead` con la chincheta, y debajo `Tables` y `Files`.
 
 Deberías ver, celda por celda:
 
-- `%pip`: "Successfully installed dayahead-0.1.0".
+- `%pip`: "Successfully installed dayahead-0.2.0".
 - Token: `token leído de 'vl_dayahead' (36 caracteres)`. Nunca el valor.
 - Esquema: `sources_config sembrada con 4 filas desde dayahead.config.DEFAULT_SOURCES`.
 - Ventana: `ventana <D-3> -> <D+1> (5 días) | países: ['ES', 'RO', 'DE', 'PL']`.

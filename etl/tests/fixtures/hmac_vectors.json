@@ -1,0 +1,26 @@
+{
+  "scheme": "HMAC-SHA256(secret, f'{timestamp}.{nonce}.' + body)",
+  "vectors": [
+    {
+      "secret": "test-secret",
+      "timestamp": 1756224000,
+      "nonce": "3f2a9c1e-5b7d-4e8a-9c0b-1d2e3f4a5b6c",
+      "body": "{\"load_control\":[],\"prices\":[],\"run_id\":\"20260826T160000Z\"}",
+      "signature": "sha256=5af8c1fd1f871df30444aa556d3f54e895a4563f3dd5fc6c90454a691d9c55c2"
+    },
+    {
+      "secret": "test-secret",
+      "timestamp": 1756224000,
+      "nonce": "3f2a9c1e-5b7d-4e8a-9c0b-1d2e3f4a5b6c",
+      "body": "{\"load_control\":[],\"prices\":[{\"business_date_local\":\"2026-08-25\",\"country_code\":\"PL\",\"currency_original\":\"PLN\",\"fx_rate\":\"4.3055\",\"fx_rate_date\":\"2026-08-25\",\"price_eur\":\"160.1951\",\"price_original\":\"689.72\",\"resolution\":\"PT15M\",\"source\":\"pse\",\"source_published_at\":\"2026-08-24T11:46:21.852000Z\",\"ts_utc\":\"2026-08-24T22:00:00Z\"}],\"run_id\":\"20260826T160000Z\"}",
+      "signature": "sha256=228d6ad7dd726fd5916c4350711fe52bc4c0ec92917e8a00a502170210395ff6"
+    },
+    {
+      "secret": "otro-secreto-ñ",
+      "timestamp": 1700000000,
+      "nonce": "00000000-0000-4000-8000-000000000000",
+      "body": "{\"a\":1,\"b\":[1,2,3],\"c\":{\"z\":\"ü\"}}",
+      "signature": "sha256=6bfc87ab414966c25eb45e3b36e66dd854f68f5e95e8b221abe27750ddb849d8"
+    }
+  ]
+}
