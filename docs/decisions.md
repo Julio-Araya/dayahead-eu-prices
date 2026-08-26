@@ -192,6 +192,20 @@ Lección para el documento: en serverless la latencia la fijan los saltos de red
 
 **Descartado.** Exponer el MCP como servidor HTTP remoto: exigiría autenticación propia (OAuth) y hosting; stdio local con la key en el entorno cubre el caso de uso de la prueba.
 
+## D23. No se conecta el workspace de Fabric a Git (2026-08-26, ratificada por Julio: opción B)
+
+**Contexto.** La integración Git de Fabric versiona todos los ítems soportados del workspace y no permite excluir ninguno. La Biblioteca de variables está soportada y su `variables.json` "contains the variable names and their default values" (documentación oficial): conectar el workspace escribiría en Git el token de ENTSO-E, el secreto HMAC y la URL de la API. Además, la conexión con GitHub exige el tenant switch "Users can synchronize workspace items with GitHub repositories" en el tenant de Grenergy, que la cuenta de prueba no controla.
+
+**Opciones evaluadas.** (A) Repositorio privado aparte solo para la demo, rotando el secreto HMAC después; (B) no conectar y documentar la razón; (C) conectar al repo de entrega: descartada porque publica secretos.
+
+**Decisión: B.** No se conecta el workspace. Razones: el único ítem que lleva secretos no se puede excluir y no existe tipo secreto en la Biblioteca de variables ni Key Vault sin registro de aplicación (D1); un repositorio privado seguiría siendo un secreto en Git; y depende de un tenant switch ajeno. El código de Fabric ya está versionado en el repo de entrega por otra vía: `fabric/notebooks/nb_dayahead_ingest.py` es el fuente y `fabric/build.py` genera el `.ipynb` que se importa. La guía `docs/fabric-git.md` queda como referencia de cómo se haría en Grenergy una vez que los secretos vivan en Azure Key Vault (`notebookutils.credentials.getSecret`).
+
+## D24. Power BI en Direct Lake con una tabla gold `prices_all` opcional (2026-08-26)
+
+**Contexto.** Desde septiembre de 2025 el Lakehouse no crea un modelo semántico por defecto; se crea a mano. Direct Lake no admite columnas calculadas ni vistas SQL sin caer a DirectQuery, y el enunciado exige una tabla por país.
+
+**Decisión.** Modelo `sm_dayahead_prices` en Direct Lake (sin copia ni refresco programado: se actualiza con cada corrida) y una tabla gold `prices_all` con la unión de las cuatro tablas, regenerada entera en cada corrida del notebook (`CREATE OR REPLACE TABLE … AS UNION ALL`; ~12.000 filas con 30 días). Está detrás del parámetro `build_gold_table` del notebook (apagado por defecto): las tablas por país siguen siendo la fuente de verdad y `prices_all` es una vista materializada de conveniencia para BI. Guía en `docs/fabric-powerbi.md`.
+
 ---
 
 ## Pendientes (deudas registradas, sin decidir)
