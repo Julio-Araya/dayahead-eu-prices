@@ -32,16 +32,18 @@ Fuente del documento técnico final. Cada decisión lleva contexto, opciones con
 
 **Elegida:** PT60M, como pide el enunciado. La resolución y el nombre del índice son parámetros de la fila de configuración (`params.index`, `params.block`, `resolution`), así que pasar Alemania a PT15M sería un cambio de configuración y un backfill, sin tocar código. Queda documentado como evolución posible.
 
-## D10. Corrida diaria: 16:00 UTC, ventana [D-3, D+1], completitud por slots (2026-08-26)
+## D10. Corrida diaria: 18:00 UTC, ventana [D-3, D+1], completitud por slots (2026-08-26)
 
 **Contexto.** Las cuatro fuentes publican el día D+1 a distintas horas: ENTSO-E y PSE alrededor de las 12:45-13:00 CET, SMARD con retraso variable (a las 13:35Z del 26-ago el 27-ago aún venía en `null`). El BCE publica la tasa del día ~16:15 CET. Un watermark simple ("último día cargado") no sirve: un día puede estar parcialmente publicado y una fuente puede corregir datos.
 
 **Decisión.**
-- Schedule diario a las **16:00 UTC**. A esa hora D+1 está publicado en ENTSO-E y PSE con margen, SMARD suele estarlo, y la tasa del BCE del día ya salió.
+- Schedule diario a las **18:00 UTC** (inicialmente 16:00; ver enmienda abajo). A esa hora D+1 está publicado en ENTSO-E y PSE con margen, la tasa del BCE del día ya salió y SMARD ya regeneró su bloque.
 - En cada corrida se procesa la ventana **[D-3, D+1]** por país, donde D es la fecha UTC de la corrida. Toda escritura es upsert por `(country_code, ts_utc)`, así que reprocesar días ya completos es inocuo y absorbe correcciones tardías.
 - Un día se marca **completo** solo cuando `slots cargados = slots esperados` para su granularidad y su calendario DST (96/92/100 para PT15M, 24/23/25 para PT60M), calculados desde `market_tz`.
 - Si un día no tiene datos (D+1 antes de publicación) el estado es **pendiente**, no error. Se reintenta en la siguiente corrida. Un día con datos pero incompleto queda **incompleto** y también se reintenta.
 - Esto reemplaza cualquier lógica de watermark.
+
+**Enmienda (2026-08-26, ratificada por Julio).** Evidencia del smoke de Fase 3: a las 14:35Z el bloque semanal de SMARD seguía siendo el generado el 25-ago a 12:42Z (D+1 alemán en `null`), y en la ingestión real de las 17:36Z ya traía el 27-ago con `meta_data.created = 2026-08-26T17:10:42Z`. Con la corrida a las 16:00 UTC Alemania habría quedado `pending` cada día hasta la corrida siguiente. Se mueve a **18:00 UTC** para que los cuatro países entren el mismo día; la ventana [D-3, D+1] sigue cubriendo cualquier retraso mayor.
 
 ## D11. `ts_utc` es el inicio del intervalo en las cuatro fuentes (2026-08-26)
 
