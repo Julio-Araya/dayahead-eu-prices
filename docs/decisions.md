@@ -182,6 +182,16 @@ Lección para el documento: en serverless la latencia la fijan los saltos de red
 - Vercel detecta `express` en `package.json` y aplica su zero-config para Express: busca un entry (`src/app.ts`) y lo invoca como servidor para `/`. `src/app.ts` exporta la fábrica `createApp` (para poder testear sin base), no la app; resultado: `Invalid export found in module … app.js` solo en la raíz, porque las demás rutas caían en el rewrite hacia `api/index.ts`. Se resolvió declarando la función de forma explícita (`builds` + `routes`), que desactiva la detección.
 - La API y la web son dos proyectos de Vercel sobre el mismo repositorio, con Root Directory `api` y `web`. Variables por proyecto en `docs/deploy-vercel.md`; los secretos nunca están en el repo.
 
+## D22. Servidor MCP de solo lectura sobre la API, con su propia key (2026-08-26)
+
+**Contexto.** Extra mile 1 del BRIEF: la vacante pide un servidor MCP. Los consumidores de la API son sistemas y agentes (D3); un servidor MCP es un consumidor más.
+
+**Decisión.** `mcp/`: servidor en TypeScript con el SDK oficial, transporte stdio, cuatro herramientas de solo lectura (`list_countries`, `get_prices`, `compare_prices`, `get_load_status`) marcadas con `readOnlyHint`. Autentica contra la API con una key propia `mcp` (60 req/min) en vez de reutilizar la del BFF: si hay abuso o fuga, se revoca sin afectar a la interfaz y el rate limit se aplica por consumidor. La key vive en el `env` de la configuración de Claude Desktop, nunca en el repo.
+
+**Diseño.** Las herramientas devuelven texto en markdown pensado para un modelo: resúmenes (media, extremos con su instante, slots negativos) antes que filas, y filas solo si se piden y con tope de 2000. `compare_prices` hace el trabajo que un modelo haría mal a mano: alinear por hora, calcular el más barato y la dispersión. La lógica es pura (`summary.ts`) y el servidor se prueba completo con el transporte en memoria del SDK y un cliente falso de la API. Verificado en vivo contra la API en Vercel (respuestas de 0,4 a 0,8 s).
+
+**Descartado.** Exponer el MCP como servidor HTTP remoto: exigiría autenticación propia (OAuth) y hosting; stdio local con la key en el entorno cubre el caso de uso de la prueba.
+
 ---
 
 ## Pendientes (deudas registradas, sin decidir)
