@@ -4,7 +4,7 @@ Dos proyectos desde el mismo repositorio (`Julio-Araya/dayahead-eu-prices`), cad
 
 ## Proyecto 1: `dayahead-api` (Root Directory = `api`)
 
-- Framework Preset: **Other**. Build Command y Output Directory: por defecto (`npm run build` compila con `tsc`; la función es `api/index.ts` y `vercel.json` reenvía toda ruta a ella). Node 20 o superior.
+- `vercel.json` declara la función de forma **explícita** (`builds` + `routes`): una sola función, `api/index.ts`, que recibe todas las rutas. Con esa configuración Vercel ignora el Framework Preset y el Build Command del proyecto (lo avisa en el build) y **no aplica su detección automática de apps Express**, que fue lo que rompió la raíz: al ver `express` en `package.json` buscó un entry (`src/app.ts`) y lo invocó como servidor para `/` ("Invalid export found in module … app.js: the default export must be a function or server"), mientras el resto de rutas caían en el rewrite hacia `api/index.ts`. Node 20 o superior.
 - Región de la función: `vercel.json` fija `dub1` (Dublín, la misma región `eu-west-1` de Supabase). Sin eso Vercel la ponía en `gru1` (São Paulo) y cada consulta pagaba ~250 ms de ida y vuelta al pooler; con la región junto a la base son unos milisegundos.
 
 | Variable | Valor | De dónde sale |
