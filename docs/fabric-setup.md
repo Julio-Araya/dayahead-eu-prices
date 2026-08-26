@@ -4,7 +4,7 @@ Paso a paso, en el orden en que se hace en el navegador. Cada paso dice qué cre
 
 | Elemento | Tipo | Nombre |
 |---|---|---|
-| Área de trabajo | Workspace | `Grenergy Day-Ahead` (o el que ya tengas asignado a la capacidad Trial) |
+| Área de trabajo | Workspace | `Day Ahead Prices - Julio Araya` (ya existe, asignado a la capacidad Trial) |
 | Lakehouse | Lakehouse | `lh_dayahead` |
 | Biblioteca de variables | Variable library | `vl_dayahead` |
 | Notebook | Notebook (PySpark) | `nb_dayahead_ingest` |
@@ -34,7 +34,7 @@ Debes ver tres líneas: el `.ipynb` generado con 19 celdas y 1 de parámetros, "
 ## 1. Workspace y capacidad Trial
 
 1. Entra a https://app.fabric.microsoft.com con el usuario de la prueba. Si aparece la pantalla de agregar teléfono, **Omitir configuración** (instrucción de la prueba).
-2. Abre el workspace de la prueba o crea uno nuevo: **Workspaces → + New workspace**, nombre `Grenergy Day-Ahead`, en **Advanced → License mode** elige **Trial** y la capacidad `Trial-…` que muestra la prueba en su captura. **Apply**.
+2. Abre el workspace `Day Ahead Prices - Julio Araya`. Confirma en **Workspace settings → License info** que está en la capacidad **Trial** (la `Trial-…` que muestra la prueba en su captura); si no, cámbiala ahí y **Apply**.
 3. Verifica el runtime: **Workspace settings → Data Engineering/Science → Spark settings → Environment → Runtime version**. Debe decir **1.3 (Spark 3.5, Delta 3.2)**. Si no, selecciónalo y guarda.
 
 Deberías ver: el workspace vacío, con el icono de diamante de Trial junto al nombre.
