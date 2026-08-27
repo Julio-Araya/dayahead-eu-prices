@@ -120,14 +120,15 @@ Vuelve a ejecutar **Run all**. El resumen tiene que ser idéntico y el conteo de
 3. Pestaña **General**: nombre `Ingest day-ahead prices`. **Retry** = 1, **Retry interval** = 300 segundos, **Timeout** = 1 hora.
 4. Pestaña **Settings**:
    - **Workspace**: el actual. **Notebook**: `nb_dayahead_ingest`.
-   - **Base parameters**: si aparece **Auto-populate** al elegir el notebook, úsalo: rellena `start_date`, `end_date`, `countries`, `publish_to_api`, `variable_library` con sus tipos. Si no, agrégalos a mano con **+ New**:
+   - **Base parameters**: si aparece **Auto-populate** al elegir el notebook, úsalo: rellena `start_date`, `end_date`, `countries`, `publish_to_api`, `build_gold_table`, `variable_library` con sus tipos. Si no, agrégalos a mano con **+ New**:
 
      | Nombre | Tipo | Valor |
      |---|---|---|
      | `start_date` | String | `@pipeline().parameters.start_date` |
      | `end_date` | String | `@pipeline().parameters.end_date` |
      | `countries` | String | `@pipeline().parameters.countries` |
-     | `publish_to_api` | Bool | `false` |
+     | `publish_to_api` | Bool | `false` (true cuando la API esté desplegada y las variables cargadas) |
+     | `build_gold_table` | Bool | `false` (true si vas a hacer el reporte Power BI; ver `docs/fabric-powerbi.md`) |
      | `_inlineInstallationEnabled` | Bool | `true` |
 
      El último es obligatorio: en ejecuciones desde pipeline la instalación inline (`%pip`) está desactivada por defecto y sin este parámetro la primera celda no instala el wheel. Para escribir `@pipeline().parameters.x` haz clic en el valor y elige **Add dynamic content**.

@@ -27,6 +27,7 @@
             "end_date": {"value": {"value": "@pipeline().parameters.end_date", "type": "Expression"}, "type": "string"},
             "countries": {"value": {"value": "@pipeline().parameters.countries", "type": "Expression"}, "type": "string"},
             "publish_to_api": {"value": "false", "type": "bool"},
+            "build_gold_table": {"value": "false", "type": "bool"},
             "_inlineInstallationEnabled": {"value": "true", "type": "bool"}
           }
         }
