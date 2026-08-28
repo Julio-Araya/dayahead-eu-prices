@@ -181,7 +181,7 @@ Detalle de D3. La clave (`dap_` + 24 bytes aleatorios en base64url) se muestra u
 
 ## D20. Lector detrás de una interfaz; resample en el servicio; una sola tabla en Postgres (2026-08-26)
 
-- `PriceReader` con dos implementaciones elegidas por `DATA_READER`: `postgres` (activa) y `fabric-graphql` (BRIEF D1, opción 3). La segunda implementa client credentials contra Entra ID y las consultas GraphQL con la convención de la API for GraphQL de Fabric (tabla pluralizada, `filter`/`first`/`orderBy`, `items`). **Hipótesis**: los nombres exactos del esquema GraphQL se confirman al crear la API en Fabric, cosa que exige un service principal que la prueba no permite. Sin credenciales, `ping()` lo dice y las lecturas responden 503.
+- `PriceReader` con dos implementaciones elegidas por `DATA_READER`: `postgres` (activa) y `fabric-graphql` (la opción 3 de D1). La segunda implementa client credentials contra Entra ID y las consultas GraphQL con la convención de la API for GraphQL de Fabric (tabla pluralizada, `filter`/`first`/`orderBy`, `items`). **Hipótesis**: los nombres exactos del esquema GraphQL se confirman al crear la API en Fabric, cosa que exige un service principal que la prueba no permite. Sin credenciales, `ping()` lo dice y las lecturas responden 503.
 - El resample PT15M → PT60M (D5) se hace en el servicio de la API, no en SQL, para que los dos lectores compartan una sola implementación probada (promedio con enteros escalados, redondeo half-up a 4 decimales, `slots` por hora para señalar horas incompletas).
 - Postgres replica las cuatro tablas de Fabric en una sola `prices` con clave `(country_code, ts_utc)` e índice por `(country_code, business_date_local)`. Una tabla por país tiene sentido en el Lakehouse (enunciado de la prueba, ingestión independiente); en la capa de servicio complica cada consulta multipaís sin aportar nada.
 - `countries` en Postgres es el espejo de `sources_config`: agregar un país a la API es una fila (`002_seed_countries.sql` hace upsert, así que se puede reaplicar).
@@ -241,7 +241,7 @@ Lección para el documento: en serverless la latencia la fijan los saltos de red
 
 ## D22. Servidor MCP de solo lectura sobre la API, con su propia key (2026-08-26)
 
-**Contexto.** Extra mile 1 del BRIEF: la vacante pide un servidor MCP. Los consumidores de la API son sistemas y agentes (D3); un servidor MCP es un consumidor más.
+**Contexto.** Primer extra planificado: la vacante pide un servidor MCP. Los consumidores de la API son sistemas y agentes (D3); un servidor MCP es un consumidor más.
 
 **Decisión.** `mcp/`: servidor en TypeScript con el SDK oficial, transporte stdio, cuatro herramientas de solo lectura (`list_countries`, `get_prices`, `compare_prices`, `get_load_status`) marcadas con `readOnlyHint`. Autentica contra la API con una key propia `mcp` (60 req/min) en vez de reutilizar la del BFF: si hay abuso o fuga, se revoca sin afectar a la interfaz y el rate limit se aplica por consumidor. La key vive en el `env` de la configuración de Claude Desktop, nunca en el repo.
 
