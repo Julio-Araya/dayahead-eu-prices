@@ -1,8 +1,65 @@
 # Registro de decisiones
 
-Fuente del documento técnico final. Cada decisión lleva contexto, opciones consideradas y por qué se eligió una. Las decisiones D1 a D6 están en `BRIEF.md` (sección 4) y no se repiten acá. Las fechas son de ratificación por Julio.
+Fuente del documento técnico final. Cada decisión lleva contexto, opciones consideradas y por qué se eligió una. D1 a D6 se cerraron antes de escribir código (2026-08-26); D7 en adelante se ratificaron durante la ejecución y llevan su fecha.
 
 ---
+
+## D1. Fabric es la fuente de verdad, la API lee desde una capa de servicio propia
+
+La cuenta de prueba en el tenant de Grenergy no permite registrar aplicaciones en Entra (los portales de Azure y Entra exigen MFA obligatorio y la instrucción de la prueba es no registrar teléfono). Sin registro de aplicación no hay service principal, y sin service principal ningún servidor externo puede autenticarse contra Fabric de forma correcta.
+
+Opciones evaluadas:
+1. Fabric publica hacia la capa de servicio. Al final de cada corrida el notebook hace POST de las filas nuevas a un endpoint de ingestión de la API, firmado con HMAC. La API y la interfaz leen desde Postgres. Elegida.
+2. Servidor externo lee el SQL endpoint de Fabric con usuario y contraseña. Descartada por seguridad. Credenciales de persona en un runtime de servidor, sin MFA, no es aceptable.
+3. Fabric API for GraphQL con service principal. Correcta en un entorno real. Imposible con el acceso actual. Queda implementada como adaptador alternativo, documentada, sin credenciales.
+
+Beneficios laterales de la opción 1: la API sirve tráfico aunque Fabric esté caído o la capacidad trial expire; el lakehouse no recibe tráfico de aplicación; el cambio a la opción 3 es una variable de entorno.
+
+## D2. Stack
+
+- Fabric: Lakehouse, notebooks en Python, pipeline programado, Biblioteca de variables para el token.
+- Capa de servicio: Supabase Postgres.
+- API: Express + TypeScript en Vercel.
+- Interfaz: React + Vite + TypeScript en Vercel, con el design system de Relevo Studio sin marca.
+- MCP: servidor MCP sobre la API, en TypeScript.
+
+## D3. Seguridad de la API
+
+API keys con hash en base de datos, alcance solo lectura, rate limit por key. La interfaz no recibe la key, va por un backend for frontend en el mismo dominio. Justificación: los consumidores son sistemas y agentes, no personas. Se documenta que el paso siguiente en Grenergy sería SSO con Entra ID sobre la misma API.
+
+El endpoint de ingestión (el que Fabric llama) usa HMAC SHA256 sobre el cuerpo con secreto compartido y timestamp para evitar replay. Es un endpoint distinto de los de lectura.
+
+## D4. Modelo de datos
+
+Fabric, una tabla Delta por país con el mismo esquema:
+
+- country_code (ES, RO, DE, PL)
+- ts_utc (timestamp, inicio del intervalo)
+- resolution (PT15M o PT60M)
+- business_date_local (date)
+- price_original (decimal)
+- currency_original (EUR o PLN)
+- price_eur (decimal)
+- fx_rate (decimal, 1.0 para EUR)
+- fx_rate_date (date)
+- source (entsoe, smard, pse)
+- ingested_at_utc (timestamp)
+
+Más dos tablas de control en Fabric:
+- sources_config: una fila por país con tipo de adaptador, parámetros, zona horaria, moneda, granularidad, activo.
+- load_control: por país y business_date, slots esperados, slots cargados, estado, último intento, último error.
+
+Y una tabla fx_rates con fecha, moneda, tasa, fuente.
+
+En Postgres se replica el mismo esquema de precios en una sola tabla `prices` con índice único en (country_code, ts_utc), más `load_control` y `api_keys`.
+
+## D5. Granularidad en la interfaz
+
+Comparación entre países en dos modos. Nativo (cada país con su resolución) y horario (PT15M promediado a PT60M). Toggle visible. La API expone ambos por parámetro.
+
+## D6. Todo en EUR, con PLN disponible
+
+La API devuelve price_eur por defecto y price_original con currency_original siempre presentes. La interfaz muestra EUR y permite ver PLN para Polonia.
 
 ## D7. Día de negocio por fuente, no por país (2026-08-26)
 
