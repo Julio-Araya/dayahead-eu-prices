@@ -34,7 +34,7 @@ ENTSO-E (ES, RO)  SMARD (DE)  PSE (PL)  BCE (EUR/PLN)
 
 Fabric es la fuente de verdad. Ahí corre el pipeline, ahí viven las tablas por país y ahí lee Power BI. La API y la interfaz no leen Fabric directo, leen una base Postgres propia que Fabric alimenta al final de cada corrida.
 
-Esa decisión tiene una razón concreta. La cuenta de prueba no puede registrar aplicaciones en Entra (los portales de Azure exigen MFA y la instrucción de la prueba era no registrar teléfono). Sin registro de aplicación no hay service principal, y sin service principal un servidor externo no tiene forma correcta de autenticarse contra Fabric. La alternativa de poner usuario y contraseña en un servidor la descarté. Entonces invertí la dirección. Fabric publica hacia la API con una firma HMAC y la API sirve desde Postgres.
+Esa decisión tiene una razón concreta. La cuenta de prueba no puede registrar aplicaciones en Entra (los portales de Azure exigen MFA y la instrucción de la prueba era no registrar teléfono). Sin registro de aplicación no hay service principal, y sin service principal un servidor externo no tiene forma correcta de autenticarse contra Fabric. La alternativa de poner usuario y contraseña en un servidor la descarté, entonces invertí la dirección: Fabric publica hacia la API con una firma HMAC y la API sirve desde Postgres.
 
 De paso salieron dos cosas buenas. La API sigue respondiendo aunque Fabric esté caído o la capacidad Trial expire, y el Lakehouse no recibe tráfico de aplicación. Si mañana existe un service principal, el lector de la API tiene un segundo adaptador (`fabric-graphql`) que se activa con una variable de entorno. El detalle está en `docs/decisions.md`, decisión D1.
 
