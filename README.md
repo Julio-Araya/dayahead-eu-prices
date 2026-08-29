@@ -126,11 +126,11 @@ El detalle completo de cada una, con las alternativas que descarté, está en `d
 
 **Escalabilidad.** Agregar un país es insertar una fila en `sources_config`, el notebook crea la tabla. Agregar una fuente es un adaptador nuevo con la misma forma que los otros cuatro. Con más volumen o más consumidores lo primero que cambiaría es el rate limit (hoy en memoria por instancia) y el particionado de `prices`. Para 4 países y 96 filas por día, Spark solo escribe Delta y no computa nada, y está documentado como decisión.
 
-**Infraestructura.** Todo en Europa. Fabric en North Europe, Supabase en eu-west-1 y la función de Vercel fijada en Dublín, con el edge cerca del cliente. La conexión directa de Supabase es solo IPv6, por eso la API usa el pooler. La latencia de punta a punta bajó de unos 6 segundos en frío a menos de un segundo después de fijar la región y cachear la validación de keys.
+**Infraestructura.** Todo en Europa. Fabric en North Europe, Supabase en eu-west-1 y la función de Vercel fijada en Dublín, con el edge cerca del cliente. La conexión directa de Supabase es solo IPv6, por eso la API usa el pooler. La latencia de punta a punta bajó de unos 6 segundos en frío a alrededor de un segundo después de fijar la región y cachear la validación de keys.
 
 ## Estado y límites
 
-Funcionando en producción desde el 26 de agosto. El pipeline corrió solo por primera vez el 27 de agosto a las 18:00 UTC y terminó en verde. La web muestra 32 días de las cuatro fuentes con cobertura al 100%.
+Funcionando en producción desde el 26 de agosto. El pipeline corrió solo por primera vez el 27 de agosto a las 18:00 UTC y terminó en verde. La web muestra más de 30 días de las cuatro fuentes con cobertura al 100%.
 
 Lo que sé que falta o que dejé en un punto intermedio:
 
