@@ -1,6 +1,6 @@
 # web — interfaz "Day-Ahead Prices"
 
-React + Vite + TypeScript. Consume la API a través de un **BFF** en el mismo dominio (`/api/*`), así la API key nunca llega al navegador (D3). Design system de `design/relevo-design-system-v1.html` aplicado como tokens CSS, sin marca.
+React + Vite + TypeScript. Consume la API a través de un **BFF** en el mismo dominio (`/api/*`), así la API key nunca llega al navegador (D3). Design system de `design/design-system.html` aplicado como tokens CSS, sin marca.
 
 ## Qué muestra
 

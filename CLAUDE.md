@@ -54,7 +54,7 @@ Van en `.env` (ignorado por git) y en `.env.example` con valores vacíos. Dentro
 
 ## Interfaz
 
-- Usa el design system de Relevo Studio que está en `/design/relevo-design-system.html`. Colores, tipografía, espaciado, componentes. Sin logo ni nombre Relevo en ninguna parte. El nombre del producto lo define Julio.
+- Usa el design system de Relevo Studio que está en `/design/design-system.html`. Colores, tipografía, espaciado, componentes. Sin logo ni nombre Relevo en ninguna parte. El nombre del producto lo define Julio.
 - Sin librerías de componentes externas más allá de lo que el design system ya usa.
 
 ## Documentación
