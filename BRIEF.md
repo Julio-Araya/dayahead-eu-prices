@@ -144,7 +144,7 @@ Fase 6. Documentación técnica ordenada en `/docs/decisions.md` para que Julio 
     prueba-tecnica-grenergy.pdf
     decisions.md
   /design
-    relevo-design-system.html
+    design-system.html
   /spike
     spike_apis.py
   /etl                   (módulo Python puro + tests)
